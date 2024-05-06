@@ -13,28 +13,67 @@ func main() {
 	// Input: root = [4,2,7,1,3,6,9]
 	// Output: [4,7,2,9,6,3,1]
 	
-	input := []int{4,2,7,1,3,6,9}
+	input := []int{1,2}
 	tree := arrayToTree(input)
-	invertedTree := invertTree(tree)
-	fmt.Println(invertedTree)
+	inv := invertTree(tree)
+	fmt.Printf("\n%+v\n", inv)
 }
 
 func invertTree(root *TreeNode) *TreeNode {
-	// put each degree of tree into queue
+	if root == nil {
+        return nil
+    }
+	
+	finalRevArray := getReverseArrayOfEachDegree(root, root.Val)
+	reversedTree := arrayToTree(finalRevArray)
 
-	// 
-	// store every nodes of this degree into array
-	// reverse array
-	// return array 
-
-	// keep array in 2d array and will reverse it later
-
-	// put the reversed flat array into arrayToTree function
-
-	// return reversed tree
-
-	return nil
+	return reversedTree
 }
+
+func getReverseArrayOfEachDegree(root *TreeNode, firstValue int) []int {
+	q := Queue{}
+	q.Enqueue(root)
+
+	var finalRevArray []int
+	finalRevArray = append(finalRevArray, firstValue)
+
+	for !q.IsEmpty() {
+		levelSize := q.Size()   // Get the number of nodes in the current level (levelSize).
+		temp := make([]*TreeNode, levelSize)
+	
+		// Traverse levelSize number of nodes and store them in a temporary list or array.
+		for i := 0; i < levelSize; i++ {
+			node := q.Dequeue()
+			temp[i] = node
+			if node.Left != nil {
+				q.Enqueue(node.Left)
+			}
+			if node.Right != nil {
+				q.Enqueue(node.Right)
+			}
+		}
+
+		var eachDegreeVal []int
+		for _, v := range q.items {
+			eachDegreeVal = append(eachDegreeVal, v.Val)
+		}
+
+		revArr := reverseArray(eachDegreeVal)
+		finalRevArray = append(finalRevArray, revArr...)
+	}
+
+	return finalRevArray
+}
+
+func reverseArray(input []int) []int {
+	reversedArr := []int{}
+	for i:=len(input); i>0; i-- {
+		reversedArr = append(reversedArr, input[i-1])
+	}
+
+	return reversedArr
+}
+
 
 // helper function for convert data structure (array to tree)
 func arrayToTree(arr []int) *TreeNode {
