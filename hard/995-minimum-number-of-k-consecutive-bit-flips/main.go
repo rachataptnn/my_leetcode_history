@@ -2,54 +2,127 @@
 
 package main
 
-func main() {
+import (
+	"errors"
+	"fmt"
+)
 
+func main() {
+	nums := []int{0, 0, 0, 1, 0, 1, 1, 0}
+	// nums := []int{0, 1, 0}
+	k := 3
+
+	result := minKBitFlips(nums, k)
+	fmt.Println(result)
 }
 
+func minKBitFlips(nums []int, k int) int {
+	flipCnt := 0
 
-k เป็น int ที่จำกำหนดความยาวของ sub array
-ทีนี้โจทย์คือ 
-ต้องทำให้ array nums เป็น 1 ทั้งก้อน [1, 1, 1, ..., 1]
-แต่เปลี่ยนได้ทีละ [] sub array ที่ความยาวจำกัดที่ k นะ
+	i := 0
+	for {
+		index := findFirstZero(nums)
+		if index == -1 {
+			fmt.Println("zero not found")
+			if flipCnt == 0 {
+				fmt.Println("flip count = 0")
+				return -1
+			}
+			return flipCnt
+		}
 
-เช่นๆ
-Example 1
-=========
-Input: nums = [0,1,0], k = 1
-Output: 2
-Explanation: Flip nums[0], then flip nums[2].
-ไม่มีไรอันนี้ให้ sub array len = 1 สบายเลย
-เปลี่ยนทีละตัวให้เป็น 1
-therefore -> minimum flip = 2 
+		subSlice, err := getSubSlice(nums, k, index)
+		if err != nil {
+			return -1
+		}
 
-Example 2
-=========
-Input: nums = [1,1,0], k = 2
-Output: -1
-Explanation: No matter how we flip subarrays of size 2, we cannot make the array become [1,1,1].
-อันนี้ก็ไม่มีไร คือแบบ มึงมี array num ยาว 3 อะ
-เราอยากทำ 1 หมด
-สมมติเขียนมือนะ 
-มึงฟลิปทีละ 2 element นะ
-ฟลิปทีนึงได้ 000 งี้
-ฟลิกอีกที 011, 110 งี้
-ยังไงก็ 111 ไม่ได้
-therefore -> minimum flip = -1 กุทำ all 1 ไม่ได้
+		flippedSlice := flip(subSlice)
 
-Example 3
-=========
-               0 1 2 3 4 5 6 7
-Input: nums = [0,0,0,1,0,1,1,0], k = 3
-Output: 3
-Explanation: 
-Flip nums[0],nums[1],nums[2]: nums becomes [1,1,1,1,0,1,1,0]
+		for j := 0; j < len(flippedSlice); j++ {
+			nums[i] = subSlice[j]
+			i++
+		}
 
-Flip nums[4],nums[5],nums[6]:
-อันนี้ flip nums[4] (0) -> 1
-flip nums[5] (1) -> 0
-flip nums[6] (1) -> 0
-nums ก็จะเป็น [1,1,1,1,1,0,0,0]
+		fmt.Println(flippedSlice)
+	}
 
-Flip nums[5],nums[6],nums[7]: nums becomes [1,1,1,1,1,1,1,1]
- 
+	return 0
+}
 
+func findFirstZero(arr []int) int {
+	for i, val := range arr {
+		if val == 0 {
+			return i
+		}
+	}
+
+	return -1
+}
+
+func getSubSlice(arr []int, k int, index int) ([]int, error) {
+	if index < 0 || index >= len(arr) || index+k > len(arr) {
+		return nil, errors.New("invalid index or length")
+	}
+	return arr[index : index+k], nil
+}
+
+func flip(arr []int) []int {
+	for i := 0; i < len(arr); i++ {
+		switch arr[i] {
+		case 0:
+			arr[i] = 1
+		case 1:
+			arr[i] = 0
+		default:
+			fmt.Println("err: num is not 0,1")
+			arr[i] = -1
+		}
+	}
+
+	return arr
+}
+
+// k เป็น int ที่จำกำหนดความยาวของ sub array
+// ทีนี้โจทย์คือ
+// ต้องทำให้ array nums เป็น 1 ทั้งก้อน [1, 1, 1, ..., 1]
+// แต่เปลี่ยนได้ทีละ [] sub array ที่ความยาวจำกัดที่ k นะ
+
+// เช่นๆ
+// Example 1
+// =========
+// Input: nums = [0,1,0], k = 1
+// Output: 2
+// Explanation: Flip nums[0], then flip nums[2].
+// ไม่มีไรอันนี้ให้ sub array len = 1 สบายเลย
+// เปลี่ยนทีละตัวให้เป็น 1
+// therefore -> minimum flip = 2
+
+// Example 2
+// =========
+// Input: nums = [1,1,0], k = 2
+// Output: -1
+// Explanation: No matter how we flip subarrays of size 2, we cannot make the array become [1,1,1].
+// อันนี้ก็ไม่มีไร คือแบบ มึงมี array num ยาว 3 อะ
+// เราอยากทำ 1 หมด
+// สมมติเขียนมือนะ
+// มึงฟลิปทีละ 2 element นะ
+// ฟลิปทีนึงได้ 000 งี้
+// ฟลิกอีกที 011, 110 งี้
+// ยังไงก็ 111 ไม่ได้
+// therefore -> minimum flip = -1 กุทำ all 1 ไม่ได้
+
+// Example 3
+// =========
+//                0 1 2 3 4 5 6 7
+// Input: nums = [0,0,0,1,0,1,1,0], k = 3
+// Output: 3
+// Explanation:
+// Flip nums[0],nums[1],nums[2]: nums becomes [1,1,1,1,0,1,1,0]
+
+// Flip nums[4],nums[5],nums[6]:
+// อันนี้ flip nums[4] (0) -> 1
+// flip nums[5] (1) -> 0
+// flip nums[6] (1) -> 0
+// nums ก็จะเป็น [1,1,1,1,1,0,0,0]
+
+// Flip nums[5],nums[6],nums[7]: nums becomes [1,1,1,1,1,1,1,1]
