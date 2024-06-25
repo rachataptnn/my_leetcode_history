@@ -3,30 +3,36 @@
 package main
 
 import (
-	"errors"
 	"fmt"
+	"time"
 )
 
 func main() {
+	startTime := time.Now()
+
 	nums := []int{0, 0, 0, 1, 0, 1, 1, 0}
-	// nums := []int{0, 1, 0}
 	k := 3
+
+	// nums := []int{0, 1, 0}
+	// k := 1
 
 	result := minKBitFlips(nums, k)
 	fmt.Println(result)
+
+	endTime := time.Now()
+	fmt.Println(startTime.Sub(endTime))
 }
 
 func minKBitFlips(nums []int, k int) int {
 	flipCnt := 0
-
 	for {
 		index := findFirstZero(nums)
 		if index == -1 {
 			return flipCnt
 		}
 
-		subSlice, err := getSubSlice(nums, k, index)
-		if err != nil {
+		subSlice := getSubSlice(nums, k, index)
+		if subSlice == nil {
 			return -1
 		}
 
@@ -45,23 +51,15 @@ func findFirstZero(arr []int) int {
 	return -1
 }
 
-func getSubSlice(arr []int, k int, index int) ([]int, error) {
-	if index < 0 || index >= len(arr) || index+k > len(arr) {
-		return nil, errors.New("invalid index or length")
+func getSubSlice(arr []int, k int, index int) []int {
+	if index+k > len(arr) {
+		return nil
 	}
-	return arr[index : index+k], nil
+	return arr[index : index+k]
 }
 
 func flip(arr []int) {
 	for i := 0; i < len(arr); i++ {
-		switch arr[i] {
-		case 0:
-			arr[i] = 1
-		case 1:
-			arr[i] = 0
-		default:
-			fmt.Println("err: num is not 0,1")
-			arr[i] = -1
-		}
+		arr[i] ^= 1
 	}
 }
