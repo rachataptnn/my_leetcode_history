@@ -24,7 +24,11 @@ type gameStates struct {
 
 func main() {
 	// input := [][]int{{2, 5}, {3}, {0, 4, 5}, {1, 4, 5}, {2, 3}, {0, 2, 3}}
-	input := [][]int{{1, 3}, {0}, {3}, {0, 2}}
+	// input := [][]int{{1, 3}, {0}, {3}, {0, 2}}
+
+	// my first invalid case 11/92
+	input := [][]int{{3, 4}, {3, 5}, {3, 6}, {0, 1, 2}, {0, 5, 6}, {1, 4}, {2, 4}}
+
 	result := catMouseGame(input)
 	fmt.Println("winner: ", result)
 }
