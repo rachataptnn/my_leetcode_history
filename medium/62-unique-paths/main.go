@@ -68,3 +68,6 @@ func calcFactorial(n *big.Int) *big.Int {
 // Claude บอกใช้ bigint
 
 // จ๊บบบ
+
+// เจอละ Combination ภาษาไทยใช้คำว่าการจัดหมวดหมู่
+// https://www.youtube.com/watch?v=YDJpoFvz1NU
