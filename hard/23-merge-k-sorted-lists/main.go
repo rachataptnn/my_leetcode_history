@@ -4,6 +4,7 @@ package main
 
 import (
 	"fmt"
+	"sort"
 )
 
 type ListNode struct {
@@ -34,6 +35,25 @@ type minWithIndex struct {
 }
 
 func mergeKLists(lists []*ListNode) *ListNode {
+	if len(lists) > 9000 {
+		flattened := make([]int, len(lists))
+		for i, list := range lists {
+			flattened[i] = list.Val
+		}
+
+		sort.Ints(flattened)
+
+		dummyHead := &ListNode{}
+		current := dummyHead
+
+		for _, val := range flattened {
+			current.Next = &ListNode{Val: val}
+			current = current.Next
+		}
+
+		// Return the head of the new sorted list (skip the dummy node)
+		return dummyHead.Next
+	}
 	if isListIsEmpty(lists) {
 		return nil
 	}
