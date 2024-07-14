@@ -12,7 +12,14 @@ import (
 func main() {
 	// input := "H20"
 	// input := "K4(ON(SO3)2)2"
-	input := "Mg(OH)2"
+	// input := "Mg(OH)2"
+
+	// 13/31
+	input := "((HHe28Be26He)9)34"
+
+	// input := "( (N42)24 (OB40Li30CHe3O48LiNN26)33 (C12Li48N30H13HBe31)21 (BHN30Li26BCBe47N40)15 (H5)16)14"
+	// asis ตอนนี้ prepare fn คืน stack, queue เดียว
+	// tobe เปลี่ยนเป็น prepare fn ต้องคืน []stack, []queue
 
 	fmt.Println(countOfAtoms(input))
 }
@@ -43,10 +50,17 @@ func countOfAtoms(formula string) string {
 	subFormulas, groupMultipliers := prepareSubFormulasAndGroupMul(formula, openBracketIndex)
 
 	beforeSort := ""
-	round := len(subFormulas)
-	for i := 0; i < round; i++ {
+	for {
+		if len(groupMultipliers) == 0 && len(subFormulas) == 0 {
+			break
+		}
+
 		subFormula := beforeSort + subFormulas.Pop()
 		groupMultiply := groupMultipliers.Dequeue()
+
+		if subFormula == "" {
+			subFormula = beforeSort
+		}
 
 		some := getElementArr(subFormula)
 		groupMultiplyInt, _ := strconv.Atoi(groupMultiply)
@@ -295,9 +309,13 @@ func (s *stack) Push(v string) {
 }
 
 func (s *stack) Pop() string {
-	member := (*s)[len(*s)-1]
-	*s = (*s)[:len(*s)-1]
-	return member
+	if len(*s) == 0 {
+		return ""
+	}
+	index := len(*s) - 1
+	element := (*s)[index]
+	*s = (*s)[:index]
+	return element
 }
 
 type Queue []string
@@ -307,6 +325,9 @@ func (q *Queue) Enqueue(v string) {
 }
 
 func (q *Queue) Dequeue() string {
+	if len(*q) == 0 {
+		return ""
+	}
 	element := (*q)[0]
 	*q = (*q)[1:]
 	return element
