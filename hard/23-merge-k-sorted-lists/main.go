@@ -5,6 +5,8 @@ package main
 import (
 	"fmt"
 	"sort"
+	"sync"
+	"sync/atomic"
 )
 
 type ListNode struct {
@@ -39,10 +41,28 @@ type minWithIndex struct {
 
 func mergeKLists(lists []*ListNode) *ListNode {
 	// Count total number of nodes
-	totalNodes := 0
-	for _, list := range lists {
-		for node := list; node != nil; node = node.Next {
-			totalNodes++
+	var totalNodes int64 = 0
+	var wg sync.WaitGroup
+
+	if len(lists) > 1000 {
+		for _, list := range lists {
+			wg.Add(1)
+			go func(l *ListNode) {
+				defer wg.Done()
+				count := 0
+				for node := l; node != nil; node = node.Next {
+					count++
+				}
+				atomic.AddInt64(&totalNodes, int64(count))
+			}(list)
+		}
+
+		wg.Wait()
+	} else {
+		for _, list := range lists {
+			for node := list; node != nil; node = node.Next {
+				totalNodes++
+			}
 		}
 	}
 

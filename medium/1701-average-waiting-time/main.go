@@ -15,25 +15,25 @@ func main() {
 }
 
 func averageWaitingTime(customers [][]int) float64 {
-	attempt := customers[0][0]
-	duration := customers[0][1]
-	start := attempt + duration
-	sumDuration := duration
+	start := customers[0][0] + customers[0][1]
+	sumDuration := customers[0][1]
 
 	for i := 1; i < len(customers); i++ {
-		duration := customers[i][1]
-		attemptTime := customers[i][0]
-
 		waitingTime := 0
-		if start < attemptTime {
-			start = attemptTime + duration
-			waitingTime = duration
+		if start < customers[i][0] {
+			start = customers[i][0] + customers[i][1]
+			waitingTime = customers[i][1]
 		} else {
-			start += duration
-			waitingTime = start - attemptTime
+			start += customers[i][1]
+			waitingTime = start - customers[i][0]
 		}
 
 		sumDuration += waitingTime
 	}
 	return float64(sumDuration) / float64(len(customers))
+}
+
+func someFn(start, attemptTime, waitingTime, sumDuration int) float64 {
+
+	return 0
 }
