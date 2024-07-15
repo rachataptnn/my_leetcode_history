@@ -19,6 +19,15 @@ func main() {
 	// 22/111
 	// input := "0-2147483647"
 
+	// sol
+	// for {} หา s[i] == '*', '/'
+	// ถ้าเจอเอา wholeA, wholeB มา *, / (สำคัญตรง wholeA, wholeB ต้องเก็บเครื่องหมาย - มาด้วย!)
+	// push ลง stackNum
+
+	// ใน s ที่โดน slice พวกผลคูณออกไปแล้ว จะเหลือแต่ +, -
+	// for {} s ตัวที่เหลือ มา +, - แล้วก็ pop ของใน stack มา +, -
+	// จบ
+
 	input := "2-3+4"
 
 	fmt.Println(calculate(input))
