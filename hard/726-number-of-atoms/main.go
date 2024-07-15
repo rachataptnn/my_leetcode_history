@@ -58,7 +58,6 @@ func countOfAtoms(formula string) string {
 	var currBracket, lastBracket bracketWithIndex
 	for !isNoBracketsLeft(formula) {
 		formula = peelOuterMultipliers(formula, openBracketIndex, currBracket, lastBracket)
-		fmt.Println("")
 	}
 
 	e := elements{}
@@ -234,7 +233,13 @@ func getGroupMul(formula string, endIndex int) int {
 		}
 	}
 
-	mulStr := formula[indexAfterEndBracket:indexEndMul]
+	mulStr := ""
+	if indexAfterEndBracket == indexEndMul {
+		mulStr = "1"
+	} else {
+		mulStr = formula[indexAfterEndBracket:indexEndMul]
+	}
+
 	mulNum, _ := strconv.Atoi(mulStr)
 
 	return mulNum
@@ -299,7 +304,15 @@ func (e *elements) summaryAtomEachElement(formula string) {
 				e.elementWithAtomAmt[name] += elementMul
 
 				if elementMul == 1 {
-					formula = formula[1+(1-mulPadding):]
+					if len(formula) > 1 {
+						if formula[1] == '1' {
+							formula = formula[1+(mulPadding):]
+						} else {
+							formula = formula[1+(1-mulPadding):]
+						}
+					} else {
+						formula = formula[1+(1-mulPadding):]
+					}
 				} else {
 					formula = formula[1+(mulPadding):]
 				}
@@ -311,10 +324,19 @@ func (e *elements) summaryAtomEachElement(formula string) {
 				e.elementWithAtomAmt[name] += elementMul
 
 				if elementMul == 1 {
-					formula = formula[2+(1-mulPadding):]
+					if len(formula) > 1 {
+						if formula[1] == '1' {
+							formula = formula[2+(mulPadding):]
+						} else {
+							formula = formula[2+(1-mulPadding):]
+						}
+					} else {
+						formula = formula[2+(1-mulPadding):]
+					}
 				} else {
 					formula = formula[2+(mulPadding):]
 				}
+
 			}
 
 			if len(formula) == 0 {
