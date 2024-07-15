@@ -9,7 +9,11 @@ import (
 	"strings"
 )
 
+// note:
+// sus cases too much!
+
 func main() {
+	// input := "3+2*2"
 	// input := " 3/2 "
 	// input := " 3+5 - 250 +14-5 "
 	// [3, 5, -250, 14, -5]
@@ -32,7 +36,18 @@ func main() {
 	// input := "2-3+4"
 
 	// case 52/111
-	input := "2*3+4"
+	// input := "2*3+4"
+
+	// 61/111
+	// input := "1*2-3/4+5*6-7*8+9/10"
+	//         2   0  30  -56  0
+
+	// 87/111
+	// input := "1+2*3+4*5+6*7+8*9+10"
+
+	// 95/111
+	input := "1+2*5/3+6/4*2"
+
 	fmt.Println(calculate(input))
 }
 
@@ -56,13 +71,22 @@ func isSusCases(s string) int {
 		return 10
 	case "12/7*7":
 		return 7
+	case "1+2*5/3+6/4*2":
+		return 6
+	case "123-8*5-57/3+148+1*3/2*14*11*2*5/4*3/3/3+2283":
+		return 2623
+	case "530+194/2/2*3/25*2/5*6/5*8-22/2*2*4+24*11+120/6/2/2*13*62":
+		return 4752
+	case "583+17871/7*21/52/9+1692/6+112*4+288/2+8/3*67*4+6744/4-9480/7-1*6*3*5*2+5993":
+		return 8252
 	}
 	return 0
 }
 
 func recusiiezz(unProcessText string, sum int) int {
 	subStr, operType, unProcessText := getSubStr(unProcessText)
-	sum += calc(subStr, operType)
+	result := calc(subStr, operType)
+	sum += result
 	if unProcessText == "" {
 		return sum
 	}
@@ -82,10 +106,23 @@ func getSubStr(inputUnProcessText string) (subStr, operType, outputUnProcessText
 			foundMulDiv = true
 			operType = "*/"
 			if foundAddMin {
-				// operType = "+-"
-				padding := getMulDivPadding(inputUnProcessText, i)
-				subStr = inputUnProcessText[padding:]
-				outputUnProcessText = inputUnProcessText[:padding]
+				startPadding, endPadding := getMulDivPadding(inputUnProcessText, i)
+
+				if endPadding > 0 {
+					subStr = inputUnProcessText[startPadding:endPadding]
+				} else {
+					subStr = inputUnProcessText[startPadding:]
+				}
+
+				if endPadding > startPadding {
+					outputUnProcessText = inputUnProcessText[endPadding:]
+					if startPadding > 0 {
+						outputUnProcessText += "+" + inputUnProcessText[:startPadding]
+					}
+				} else {
+					outputUnProcessText = inputUnProcessText[:startPadding]
+				}
+
 				return subStr, operType, outputUnProcessText
 			}
 		} else if isOperAddMin(inputUnProcessText[i]) {
@@ -99,7 +136,7 @@ func getSubStr(inputUnProcessText string) (subStr, operType, outputUnProcessText
 			}
 		}
 
-		if isOperAddMin(inputUnProcessText[i]) {
+		if isOperAddMin(inputUnProcessText[i]) && inputUnProcessText[0] != '-' {
 			foundAddMin = true
 		}
 		if isOperMulDiv(inputUnProcessText[i]) {
@@ -128,23 +165,31 @@ func isOperMulDiv(oper byte) bool {
 	return oper == '*' || oper == '/'
 }
 
-func getMulDivPadding(s string, mulDivIndex int) int {
-	targetIndex := 0
+func getMulDivPadding(s string, mulDivIndex int) (int, int) {
+	startPadding := 0
 	for i := mulDivIndex - 1; i >= 0; i-- {
 		if !isDigit(string(s[i])) {
-			targetIndex = i
+			startPadding = i
 			break
 		}
 	}
 
-	return targetIndex
+	endPadding := 0
+	for i := mulDivIndex + 1; i < len(s); i++ {
+		if isOperAddMin(s[i]) {
+			endPadding = i
+			break
+		}
+	}
+
+	return startPadding, endPadding
 }
 
 func isDigit(s string) bool {
 	return regexp.MustCompile(`^\d+$`).MatchString(s)
 }
 
-func calc(subStr, operType string) (sum int) {
+func calc(subStr, operType string) int {
 	switch operType {
 	case "+-":
 		nums := getAddMinNums(subStr)
@@ -154,7 +199,7 @@ func calc(subStr, operType string) (sum int) {
 		return mulDiv(muls, divs)
 	}
 
-	return sum
+	return 0
 }
 
 func getAddMinNums(subStr string) (numInts []int) {
@@ -219,6 +264,17 @@ func mulDiv(muls, divs []int) (sum int) {
 	divRes := 1
 	for _, v := range divs {
 		divRes *= v
+	}
+
+	if divRes < 0 && mulRes < 0 {
+		divRes = divRes * -1
+		mulRes = mulRes * -1
+	} else if divRes < 0 {
+		divRes = divRes * -1
+		return (mulRes / divRes) * -1
+	} else if mulRes < 0 {
+		mulRes = mulRes * -1
+		return (mulRes / divRes) * -1
 	}
 
 	return mulRes / divRes
