@@ -27,25 +27,29 @@ func main() {
 }
 
 func frequencySort(nums []int) []int {
-	matrix := makeFreqMap(nums)
-	// sortedMap := sortMapByKey(mapOfArr)
+	matrix := prepareFreqMatrix(nums)
 
 	res := []int{}
 	for _, v := range matrix {
 		sort.Sort(sort.Reverse(sort.IntSlice(v)))
-		// sort.Ints(v)
 		res = append(res, v...)
 	}
 
 	return res
 }
 
-func makeFreqMap(nums []int) [][]int {
+func prepareFreqMatrix(nums []int) [][]int {
+	// used for count the frequency
+	// key    val
+	// 1      10    (found number 1, 10 times)
 	freqMap := make(map[int]int)
 	for _, num := range nums {
 		freqMap[num] += 1
 	}
 
+	// revert key and val
+	// from [1]10, [12]10, [3]10, [8]5
+	// to   [10][1, 12, 3], [5][8]
 	mapOfArr := make(map[int][]int)
 	for k, freq := range freqMap {
 		for i := 0; i < freq; i++ {
@@ -54,18 +58,16 @@ func makeFreqMap(nums []int) [][]int {
 		}
 	}
 
+	// sorting the lowest freq come first!
+	// and i call it matrix not 2d array bcuz is lil bit too much cute <3
 	keys := make([]int, 0, len(mapOfArr))
 	for k := range mapOfArr {
 		keys = append(keys, k)
 	}
 	sort.Ints(keys)
-
-	bruh := make([][]int, len(keys))
-
-	// Populate the 2D slice
+	freqMatrix := make([][]int, len(keys))
 	for i, key := range keys {
-		bruh[i] = mapOfArr[key]
+		freqMatrix[i] = mapOfArr[key]
 	}
-
-	return bruh
+	return freqMatrix
 }
