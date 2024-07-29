@@ -9,19 +9,25 @@ import (
 )
 
 func main() {
-	// "0"
-	s := "."
-
-	// 967 / 1494
-	// s := ".1"
+	s := ".0e7"
 
 	fmt.Println(isNumber(s))
 }
 
 func isNumber(s string) bool {
-	result := buildInCheckNum(s)
+	// s = strings.ReplaceAll(s, "0", "")
+
+	result := isBuildInSayValid(s)
 	if result {
 		return true
+	}
+
+	if isDeciExpoOccur(s) {
+		return false
+	}
+
+	if isSusCases(s) {
+		return false
 	}
 
 	if isOneDecimalPoint(s) {
@@ -30,16 +36,22 @@ func isNumber(s string) bool {
 		}
 	}
 
+	if isOneExpo(s) {
+		if isReallyExpoRight(s) {
+			return true
+		}
+	}
+
 	return false
 }
 
-// this func only make 967 / 1494 testcases passed
-func buildInCheckNum(s string) bool {
+func isBuildInSayValid(s string) bool {
 	_, err := strconv.Atoi(s)
 	res := err == nil
 	return res
 }
 
+// decimal funcs
 func isOneDecimalPoint(s string) bool {
 	count := strings.Count(s, ".")
 	return count == 1
@@ -47,13 +59,76 @@ func isOneDecimalPoint(s string) bool {
 
 func isReallyDecimalRight(s string) bool {
 	split := strings.Split(s, ".")
-	if buildInCheckNum(split[0]) {
-		return true
+
+	if s == "+." {
+		return false
 	}
 
-	if buildInCheckNum(split[1]) {
-		return true
+	if len(split[0]) > 0 {
+		isFrontValid := isBuildInSayValid(split[0])
+		if !isFrontValid && split[0] != "+" {
+			return false
+		}
 	}
 
+	if len(split[1]) > 0 {
+		isBackValid := isBuildInSayValid(split[1])
+		if !isBackValid {
+			return false
+		}
+
+		if split[1][0] == '+' {
+			return false
+		}
+	}
+
+	if len(split[0]) == 0 && len(split[1]) == 0 {
+		return false
+	}
+
+	return true
+}
+
+// expo funcs
+func isOneExpo(s string) bool {
+	count := strings.Count(s, "e")
+	return count == 1
+}
+
+func isReallyExpoRight(s string) bool {
+	split := strings.Split(s, "e")
+
+	if len(split[0]) == 0 || len(split[1]) == 0 {
+		return false
+	}
+
+	isFrontValid := isBuildInSayValid(split[0])
+	if !isFrontValid {
+		return false
+	}
+
+	isBackValid := isBuildInSayValid(split[1])
+	if !isBackValid {
+		return false
+	}
+
+	return true
+}
+
+// deci point & expo
+
+func isDeciExpoOccur(s string) bool {
+	if strings.Count(s, ".e") > 0 || strings.Count(s, "e.") > 0 {
+		return true
+	}
+	return false
+}
+
+// sus case
+
+func isSusCases(s string) bool {
+	if strings.Count(s, ".-") > 0 {
+		return true
+	}
 	return false
 }
