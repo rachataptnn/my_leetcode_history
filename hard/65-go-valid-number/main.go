@@ -4,131 +4,51 @@ package main
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
+	"unicode"
 )
 
 func main() {
-	s := ".0e7"
+	s := "3E+7"
 
 	fmt.Println(isNumber(s))
 }
 
 func isNumber(s string) bool {
-	// s = strings.ReplaceAll(s, "0", "")
+	s = strings.TrimSpace(s)
 
-	result := isBuildInSayValid(s)
-	if result {
-		return true
-	}
+	pointSeen := false
+	eSeen := false
+	numberSeen := false
+	numberAfterE := true
 
-	if isDeciExpoOccur(s) {
-		return false
-	}
+	for i, ch := range s {
+		if unicode.IsDigit(ch) {
+			numberSeen = true
+			numberAfterE = true
 
-	if isSusCases(s) {
-		return false
-	}
+		} else if ch == '.' {
+			if eSeen || pointSeen {
+				return false // found e or . more than 1 -> false
+			}
+			pointSeen = true
 
-	if isOneDecimalPoint(s) {
-		if isReallyDecimalRight(s) {
-			return true
-		}
-	}
+		} else if ch == 'e' || ch == 'E' {
+			if eSeen || !numberSeen {
+				return false // found e before any num -> false
+			}
+			numberAfterE = false
+			eSeen = true
 
-	if isOneExpo(s) {
-		if isReallyExpoRight(s) {
-			return true
-		}
-	}
+		} else if ch == '-' || ch == '+' {
+			if i != 0 && (s[i-1] != 'e' && s[i-1] != 'E') {
+				return false // if found -e, +e -> false (i!=0 is just prevent out of range)
+			}
 
-	return false
-}
-
-func isBuildInSayValid(s string) bool {
-	_, err := strconv.Atoi(s)
-	res := err == nil
-	return res
-}
-
-// decimal funcs
-func isOneDecimalPoint(s string) bool {
-	count := strings.Count(s, ".")
-	return count == 1
-}
-
-func isReallyDecimalRight(s string) bool {
-	split := strings.Split(s, ".")
-
-	if s == "+." {
-		return false
-	}
-
-	if len(split[0]) > 0 {
-		isFrontValid := isBuildInSayValid(split[0])
-		if !isFrontValid && split[0] != "+" {
+		} else {
 			return false
 		}
 	}
 
-	if len(split[1]) > 0 {
-		isBackValid := isBuildInSayValid(split[1])
-		if !isBackValid {
-			return false
-		}
-
-		if split[1][0] == '+' {
-			return false
-		}
-	}
-
-	if len(split[0]) == 0 && len(split[1]) == 0 {
-		return false
-	}
-
-	return true
-}
-
-// expo funcs
-func isOneExpo(s string) bool {
-	count := strings.Count(s, "e")
-	return count == 1
-}
-
-func isReallyExpoRight(s string) bool {
-	split := strings.Split(s, "e")
-
-	if len(split[0]) == 0 || len(split[1]) == 0 {
-		return false
-	}
-
-	isFrontValid := isBuildInSayValid(split[0])
-	if !isFrontValid {
-		return false
-	}
-
-	isBackValid := isBuildInSayValid(split[1])
-	if !isBackValid {
-		return false
-	}
-
-	return true
-}
-
-// deci point & expo
-
-func isDeciExpoOccur(s string) bool {
-	if strings.Count(s, ".e") > 0 || strings.Count(s, "e.") > 0 {
-		return true
-	}
-	return false
-}
-
-// sus case
-
-func isSusCases(s string) bool {
-	if strings.Count(s, ".-") > 0 {
-		return true
-	}
-	return false
+	return numberSeen && numberAfterE
 }

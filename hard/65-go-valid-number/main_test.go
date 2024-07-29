@@ -91,10 +91,20 @@ func TestFn(t *testing.T) {
 		},
 
 		{
-
 			caseName: "fkcname",
 			input:    ".0e7",
 			output:   true,
+		},
+
+		{
+			caseName: "fkcname",
+			input:    "6ee69",
+			output:   false,
+		},
+		{
+			caseName: "fkcname",
+			input:    "3E+7",
+			output:   false,
 		},
 	}
 
