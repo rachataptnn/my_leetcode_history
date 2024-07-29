@@ -51,16 +51,16 @@ func (s *states) recursiveFn() *ListNode {
 				current.Next = &ListNode{Val: v}
 				current = current.Next
 			}
-			*(s.resTail) = current
+			s.resTail = &current
 		} else {
 			for _, v := range s.tempArr {
 				(*s.resTail).Next = &ListNode{Val: v}
-				*(s.resTail) = (*s.resTail).Next
+				*s.resTail = (*s.resTail).Next
 			}
 		}
 		s.tempArr = []int{}
 	}
-
+	s.head = s.head.Next
 	return s.recursiveFn()
 }
 
