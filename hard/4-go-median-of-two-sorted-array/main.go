@@ -24,19 +24,14 @@ func main() {
 }
 
 func findMedianSortedArrays(nums1 []int, nums2 []int) float64 {
-	n := len(nums1) + len(nums2)
 	mergedArr := mergeSortedArr(nums1, nums2)
-	var median float64
-
-	if n%2 == 0 {
+	if (len(nums1)+len(nums2))%2 == 0 {
 		leftMedian := float64(mergedArr[(len(mergedArr)/2)-1])
 		rightMedian := float64(mergedArr[len(mergedArr)/2])
-		median = (leftMedian + rightMedian) / 2
+		return (leftMedian + rightMedian) / 2
 	} else {
-		median = float64(mergedArr[(len(mergedArr) / 2)])
+		return float64(mergedArr[(len(mergedArr) / 2)])
 	}
-
-	return median
 }
 
 func mergeSortedArr(nums1, nums2 []int) []int {
