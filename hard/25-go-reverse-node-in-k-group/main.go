@@ -18,73 +18,6 @@ type ListNode struct {
 	Next *ListNode
 }
 
-func reverseKGroup(head *ListNode, k int) *ListNode {
-	s := states{
-		head:    head,
-		tempArr: []int{},
-		k:       k,
-	}
-
-	return s.recursiveFn()
-}
-
-type states struct {
-	head    *ListNode
-	res     *ListNode
-	resTail **ListNode
-	k       int
-	tempArr []int
-
-	stepAmt int
-}
-
-func (s *states) recursiveFn() *ListNode {
-	if s.head == nil {
-		for _, v := range s.tempArr {
-			(*s.resTail).Next = &ListNode{Val: v}
-			*s.resTail = (*s.resTail).Next
-		}
-		return s.res
-	}
-
-	s.tempArr = append(s.tempArr, s.head.Val)
-	if len(s.tempArr) == s.k {
-		reverseSlice(s.tempArr)
-
-		if s.res == nil {
-			s.res = &ListNode{Val: s.tempArr[0]}
-			current := s.res
-			for _, v := range s.tempArr[1:] {
-				current.Next = &ListNode{Val: v}
-				current = current.Next
-			}
-			s.resTail = &current
-		} else {
-			for _, v := range s.tempArr {
-				(*s.resTail).Next = &ListNode{Val: v}
-				*s.resTail = (*s.resTail).Next
-			}
-		}
-
-		s.stepAmt++
-		s.tempArr = []int{}
-	}
-	s.head = s.head.Next
-	return s.recursiveFn()
-}
-
-func reverseSlice(slice []int) {
-	i := 0
-	j := len(slice) - 1
-
-	// swapping elements til pointers meet in the middle
-	for i < j {
-		slice[i], slice[j] = slice[j], slice[i]
-		i++
-		j--
-	}
-}
-
 // helper function
 
 func initLinkedList(arr []int) *ListNode {
@@ -101,4 +34,77 @@ func initLinkedList(arr []int) *ListNode {
 	}
 
 	return head
+}
+
+// start
+
+func reverseKGroup(head *ListNode, k int) *ListNode {
+	s := states{
+		head: head,
+		k:    k,
+	}
+
+	return s.reverseProcess()
+}
+
+type states struct {
+	head *ListNode
+	k    int
+
+	tempArr []int
+	res     *ListNode
+	resTail **ListNode
+
+	stepAmt int
+}
+
+func (s *states) reverseProcess() *ListNode {
+	if s.head == nil {
+		s.appendToResultList()
+		return s.res
+	}
+
+	s.tempArr = append(s.tempArr, s.head.Val)
+	if len(s.tempArr) == s.k {
+		reverseSlice(s.tempArr)
+
+		if s.res == nil {
+			s.initializeResultList()
+		} else {
+			s.appendToResultList()
+		}
+		s.tempArr = []int{}
+		s.stepAmt++
+	}
+	s.head = s.head.Next
+	return s.reverseProcess()
+}
+
+func (s *states) initializeResultList() {
+	s.res = &ListNode{Val: s.tempArr[0]}
+	current := s.res
+	for _, v := range s.tempArr[1:] {
+		current.Next = &ListNode{Val: v}
+		current = current.Next
+	}
+	s.resTail = &current
+}
+
+func (s *states) appendToResultList() {
+	for _, v := range s.tempArr {
+		(*s.resTail).Next = &ListNode{Val: v}
+		*s.resTail = (*s.resTail).Next
+	}
+}
+
+func reverseSlice(slice []int) {
+	i := 0
+	j := len(slice) - 1
+
+	// swapping elements til pointers meet in the middle
+	for i < j {
+		slice[i], slice[j] = slice[j], slice[i]
+		i++
+		j--
+	}
 }
