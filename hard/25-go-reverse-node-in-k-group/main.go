@@ -34,16 +34,23 @@ type states struct {
 	resTail **ListNode
 	k       int
 	tempArr []int
+
+	stepAmt int
 }
 
 func (s *states) recursiveFn() *ListNode {
 	if s.head == nil {
+		for _, v := range s.tempArr {
+			(*s.resTail).Next = &ListNode{Val: v}
+			*s.resTail = (*s.resTail).Next
+		}
 		return s.res
 	}
 
 	s.tempArr = append(s.tempArr, s.head.Val)
 	if len(s.tempArr) == s.k {
 		reverseSlice(s.tempArr)
+
 		if s.res == nil {
 			s.res = &ListNode{Val: s.tempArr[0]}
 			current := s.res
@@ -58,6 +65,8 @@ func (s *states) recursiveFn() *ListNode {
 				*s.resTail = (*s.resTail).Next
 			}
 		}
+
+		s.stepAmt++
 		s.tempArr = []int{}
 	}
 	s.head = s.head.Next
