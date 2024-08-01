@@ -1,6 +1,7 @@
 # Intuition
 &nbsp;&nbsp;&nbsp;&nbsp;Each string has a part that shows the age. We can take this part, turn it into a number, and check if it's over 60.
 
+
 <br/>
 
 # Approach
