@@ -1,26 +1,29 @@
+import scala.collection.mutable
+
 object Solution {
 
-    import scala.collection.mutable
+  def findDuplicates(nums: Array[Int]): Array[Int] = {
+    val someMap: mutable.Map[Int, Int] = mutable.Map()
+    val res = mutable.ListBuffer[Int]()
 
-    def findDuplicates(nums Array[Int]): Array[Int] = {
-        val someMap: mutable.Map[Int, Int] = mutable.Map()
-        val res: Array[Int]
-
-        for (num <- nums) {
-            someMap[num]++
-        }
-
-        for ((k,v) <- someMap) {
-            if (v > 1) {
-                val res = res :+ k
-            }
-        }
-
+    // Populate the map with counts
+    for (num <- nums) {
+      someMap(num) = someMap.getOrElse(num, 0) + 1
     }
 
-    def main(args: Array[Int]): Unit = {
-        val nums = Array(4, 3, 2, 7, 8, 2, 3, 1)
-        val dup = findDuplicates(num)
-        println(dup)
+    // Find duplicates and add to result
+    for ((k, v) <- someMap) {
+      if (v > 1) {
+        res += k
+      }
     }
+
+    res.toArray
+  }
+
+  def main(args: Array[String]): Unit = {
+    val nums = Array(4, 3, 2, 7, 8, 2, 3, 1)
+    val duplicates = findDuplicates(nums)
+    println(duplicates.mkString(", ")) // Output: 2, 3
+  }
 }
