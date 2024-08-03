@@ -1,83 +1,74 @@
-// https://leetcode.com/problems/find-the-city-with-the-smallest-number-of-neighbors-at-a-threshold-distance/?envType=daily-question&envId=2024-07-26
-
 package main
 
 import (
 	"fmt"
+	"sort"
 )
 
 func main() {
-	// n := 4
-	// edges := [][]int{{0, 1, 3}, {1, 2, 1}, {1, 3, 4}, {2, 3, 1}}
-	// distanceThreshold := 4
-
-	n := 5
-	edges := [][]int{{0, 1, 2}, {0, 4, 8}, {1, 2, 3}, {1, 4, 2}, {2, 3, 1}, {3, 4, 1}}
-	distanceThreshold := 2
-
-	// 5/54
-	// n := 6
-	// edges := [][]int{{0, 3, 7}, {2, 4, 1}, {0, 1, 5}, {2, 3, 10}, {1, 3, 6}, {1, 2, 1}}
-	// distanceThreshold := 417
-
-	fmt.Println(findTheCity(n, edges, distanceThreshold))
+	rating := []int{2, 5, 3, 4, 1}
+	fmt.Println(numTeams(rating))
 }
 
-func findTheCity(n int, edges [][]int, distanceThreshold int) int {
-	summaryDistances := floydWarshallAlgorithm(edges, n)
-	city := getTheRightCity(summaryDistances, distanceThreshold, n)
-
-	return city
-}
-
-func floydWarshallAlgorithm(edges [][]int, n int) [][]int {
-	summaryDistances := make([][]int, n)
-	for i := range summaryDistances {
-		summaryDistances[i] = make([]int, n)
-		for j := range summaryDistances[i] {
-			summaryDistances[i][j] = 10001
-		}
-		summaryDistances[i][i] = 0
+func numTeams(rating []int) int {
+	n := len(rating)
+	if n < 3 {
+		return 0
 	}
 
-	for _, edge := range edges {
-		srcNode := edge[0]
-		dstNode := edge[1]
-		distance := edge[2]
-
-		summaryDistances[srcNode][dstNode] = distance
-		summaryDistances[dstNode][srcNode] = distance
+	type soldier struct {
+		rating, index int
 	}
 
-	for k := 0; k < n; k++ {
+	soldiers := make([]soldier, n)
+	for i, r := range rating {
+		soldiers[i] = soldier{r, i}
+	}
+	sort.Slice(soldiers, func(i, j int) bool {
+		return soldiers[i].rating < soldiers[j].rating
+	})
+
+	indexMap := make([]int, n)
+	for i, s := range soldiers {
+		indexMap[s.index] = i
+	}
+
+	countTeams := func(ascending bool) int {
+		bit := make([]int, n+1)
+		teams := 0
+
 		for i := 0; i < n; i++ {
-			for j := 0; j < n; j++ {
-				if summaryDistances[i][k]+summaryDistances[k][j] < summaryDistances[i][j] {
-					summaryDistances[i][j] = summaryDistances[i][k] + summaryDistances[k][j]
-				}
+			rank := indexMap[i] + 1
+			var left, right int
+			if ascending {
+				left = getSum(bit, rank-1)
+				right = n - rank - (getSum(bit, n) - getSum(bit, rank))
+			} else {
+				left = getSum(bit, n) - getSum(bit, rank)
+				right = rank - 1 - getSum(bit, rank-1)
 			}
+			teams += left * right
+			update(bit, rank, 1)
 		}
+
+		return teams
 	}
 
-	return summaryDistances
+	return countTeams(true) + countTeams(false)
 }
 
-func getTheRightCity(dist [][]int, distanceThreshold, n int) int {
-	minReachableCities := n
-	result := -1
-
-	for i := 0; i < n; i++ {
-		reachableCities := 0
-		for j := 0; j < n; j++ {
-			if dist[i][j] <= distanceThreshold {
-				reachableCities++
-			}
-		}
-		if reachableCities <= minReachableCities {
-			minReachableCities = reachableCities
-			result = i
-		}
+func update(bit []int, index, val int) {
+	for index < len(bit) {
+		bit[index] += val
+		index += index & (-index)
 	}
+}
 
-	return result
+func getSum(bit []int, index int) int {
+	sum := 0
+	for index > 0 {
+		sum += bit[index]
+		index -= index & (-index)
+	}
+	return sum
 }

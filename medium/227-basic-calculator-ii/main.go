@@ -46,16 +46,17 @@ func main() {
 	// input := "1+2*3+4*5+6*7+8*9+10"
 
 	// 95/111
-	input := "1+2*5/3+6/4*2"
+	// input := "1+2*5/3+6/4*2"
 
+	input := "14/3*2"
 	fmt.Println(calculate(input))
 }
 
 func calculate(s string) int {
-	sus := isSusCases(s)
-	if sus != 0 {
-		return sus
-	}
+	// sus := isSusCases(s)
+	// if sus != 0 {
+	// 	return sus
+	// }
 
 	s = strings.ReplaceAll(s, " ", "")
 	sum := recusiiezz(s, 0)
