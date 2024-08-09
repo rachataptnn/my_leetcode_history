@@ -10,7 +10,12 @@ func main() {
 	// 	{9, 5, 1, 9},
 	// 	{2, 7, 6, 2}}
 
-	grid := [][]int{{8}}
+	// grid := [][]int{{8}}
+
+	grid := [][]int{
+		{10, 3, 5},
+		{1, 6, 11},
+		{7, 9, 2}}
 
 	fmt.Println(numMagicSquaresInside(grid))
 }
@@ -35,7 +40,7 @@ func numMagicSquaresInside(grid [][]int) int {
 		row3 := []int{grid[curRow+2][curCol], grid[curRow+2][curCol+1], grid[curRow+2][curCol+2]}
 
 		square := [][]int{row1, row2, row3}
-		if isDistinct(square) {
+		if allCellsDistinctAndInRange(square) {
 			if isMagicSquare(square) {
 				res++
 			}
@@ -57,11 +62,14 @@ func numMagicSquaresInside(grid [][]int) int {
 	return res
 }
 
-func isDistinct(square [][]int) bool {
+func allCellsDistinctAndInRange(square [][]int) bool {
 	seen := make(map[int]struct{})
 
 	for _, row := range square {
 		for _, num := range row {
+			if num < 0 || num > 9 {
+				return false
+			}
 			if _, exists := seen[num]; exists {
 				return false // Duplicate found
 			}
