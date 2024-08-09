@@ -12,10 +12,15 @@ func main() {
 
 	// grid := [][]int{{8}}
 
+	// grid := [][]int{
+	// 	{10, 3, 5},
+	// 	{1, 6, 11},
+	// 	{7, 9, 2}}
+
 	grid := [][]int{
-		{10, 3, 5},
-		{1, 6, 11},
-		{7, 9, 2}}
+		{7, 0, 5},
+		{2, 4, 6},
+		{3, 8, 1}}
 
 	fmt.Println(numMagicSquaresInside(grid))
 }
@@ -67,7 +72,7 @@ func allCellsDistinctAndInRange(square [][]int) bool {
 
 	for _, row := range square {
 		for _, num := range row {
-			if num < 0 || num > 9 {
+			if num < 1 || num > 9 {
 				return false
 			}
 			if _, exists := seen[num]; exists {
