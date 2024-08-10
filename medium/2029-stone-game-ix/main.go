@@ -1,5 +1,10 @@
 // https://leetcode.com/problems/stone-game-ix/
 
+// note:
+// after read some bro solution -> https://leetcode.com/problems/stone-game-ix/solutions/1618468/golang-o-n-solution-with-explanation/
+// i understand why i stuck on the 6x/106 wall
+// i didnt do the optimal play for alice!
+
 package main
 
 import (
