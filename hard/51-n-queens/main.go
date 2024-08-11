@@ -11,6 +11,8 @@ func main() {
 	n := 4
 	fmt.Println(solveNQueens(n))
 }
+
+// i need to learn backtracking! look like this problem must be solve in O(n!)
 func solveNQueens(n int) [][]string {
 	switch n {
 	case 1:
