@@ -44,6 +44,7 @@ func main() {
 func smallestDistancePair(nums []int, k int) int {
 	sort.Ints(nums)
 
+	// Binary Search:
 	minNum := nums[0]
 	maxNum := nums[len(nums)-1]
 
@@ -55,12 +56,12 @@ func smallestDistancePair(nums []int, k int) int {
 
 		pairsCount := countPairsWithDistanceLessThanOrEqual(nums, midDistance)
 		if pairsCount >= k {
-			// If we have at least k pairs, the `k-th smallest` is in the lower half
-			// -> narrow down search -> search only lower half
+			// If we have at least k pairs
+			// the k-th smallest distance is in the lower half, so narrow down the search
 			maxDistance = midDistance
 		} else {
-			// If we have fewer than k pairs, the `k-th smallest`` is in the upper half
-			// -> narrow down search -> search only upper half
+			// If we have fewer than k pairs
+			// the k-th smallest distance is in the upper half, so narrow up the search
 			minDistance = midDistance + 1
 		}
 	}
@@ -72,9 +73,9 @@ func countPairsWithDistanceLessThanOrEqual(nums []int, targetDistance int) int {
 	count := 0
 	right := 0
 
+	// Two Pointer:
 	for left := 0; left < len(nums); left++ {
-		// Move the right pointer as far as possible while maintaining the distance condition
-		for right < len(nums) && nums[right]-nums[left] <= targetDistance {
+		for right < len(nums) && nums[right]-nums[left] <= targetDistance { // Move the right pointer while maintaining the distance condition
 			right++
 		}
 		count += right - left - 1 // Count the pairs between left and right (excluding the pair with itself)
