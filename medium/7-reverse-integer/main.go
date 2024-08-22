@@ -4,6 +4,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"strconv"
 )
 
@@ -21,6 +22,10 @@ func reverseInt(num int) int {
 	str := strconv.Itoa(num)
 	reversedStr := reverseString(str)
 	reversedInt, _ := strconv.Atoi(reversedStr)
+
+	if reversedInt > math.MaxInt32 || reversedInt < math.MinInt32 {
+		return 0
+	}
 
 	return reversedInt
 }
