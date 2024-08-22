@@ -1,7 +1,6 @@
 var nums = [1, 6, 1];
 var k = 3;
 console.log(smallestDistancePair(nums, k));
-
 function smallestDistancePair(nums, k) {
     nums.sort(function (a, b) { return a - b; });
     // Binary Search:
@@ -25,7 +24,6 @@ function smallestDistancePair(nums, k) {
     }
     return minDistance;
 }
-
 function countPairsWithDistanceLessThanOrEqual(nums, targetDistance) {
     var count = 0;
     var right = 0;
