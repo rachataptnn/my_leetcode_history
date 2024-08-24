@@ -8,39 +8,37 @@ import (
 )
 
 func main() {
-	n := "123"
+	n := "807045053224792883"
 	fmt.Println(nearestPalindromic(n))
 }
 
 func nearestPalindromic(n string) string {
-	if n == "" {
-		return ""
+	padding := 1
+	nInt, _ := strconv.Atoi(n)
+	for {
+		leftNum := strconv.Itoa(nInt - padding)
+		rightNum := strconv.Itoa(nInt + padding)
+		if isPalindrome(leftNum) {
+			return leftNum
+		}
+		if isPalindrome(rightNum) {
+			return rightNum
+		}
+		padding++
 	}
-
-	if len(n) == 1 {
-		conv, _ := strconv.Atoi(n)
-		dec := conv - 1
-		return strconv.Itoa(dec)
-	}
-
-	halfN := len(n) / 2
-	subStr := n[:halfN]
-	rev := revStr(subStr)
-
-	if len(n)%2 == 0 {
-		palindrome := n[:halfN] + rev
-		return palindrome
-	}
-
-	palindrome := n[:halfN+1] + rev
-	return palindrome
 }
 
-func revStr(subStr string) string {
-	rev := ""
-	for i := len(subStr) - 1; i >= 0; i-- {
-		rev += string(subStr[i])
+func isPalindrome(str string) bool {
+	indexFirst := 0
+	indexLast := len(str) - 1
+
+	for indexFirst < indexLast {
+		if str[indexFirst] != str[indexLast] {
+			return false
+		}
+		indexFirst++
+		indexLast--
 	}
 
-	return rev
+	return true
 }
