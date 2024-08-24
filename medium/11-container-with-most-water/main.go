@@ -25,31 +25,20 @@ func maxArea(height []int) int {
 	left := 0
 	right := len(height) - 1
 
-	round := 0
 	for left < right {
-		if left == right-1 {
-			fmt.Println("")
-		}
 		w := right - left
 		h := min(height[left], height[right])
 		area := w * h
 		if area > maxArea {
-			if area == 705634720 {
-				fmt.Println("")
-			}
 			maxArea = area
 		}
 
 		isLeftPillarShorter := height[right] > height[left]
 		if isLeftPillarShorter {
 			left++
-			fmt.Println("")
 		} else {
 			right--
-			fmt.Println("")
 		}
-		round++
-		fmt.Println("")
 	}
 
 	return maxArea
