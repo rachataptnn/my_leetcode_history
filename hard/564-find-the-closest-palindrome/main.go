@@ -2,27 +2,19 @@
 
 package main
 
-import "strconv"
+import (
+	"fmt"
+	"strconv"
+)
 
 func main() {
-
+	n := "123"
+	fmt.Println(nearestPalindromic(n))
 }
 
 func nearestPalindromic(n string) string {
-	if n == "123" {
-		return "121"
-	}
-
-	if n == "1213" {
-		return "1221"
-	}
-
-	if n == "230" {
-		return "232"
-	}
-
-	if n == "12" {
-		return "11"
+	if n == "" {
+		return ""
 	}
 
 	if len(n) == 1 {
@@ -31,5 +23,24 @@ func nearestPalindromic(n string) string {
 		return strconv.Itoa(dec)
 	}
 
-	return "0"
+	halfN := len(n) / 2
+	subStr := n[:halfN]
+	rev := revStr(subStr)
+
+	if len(n)%2 == 0 {
+		palindrome := n[:halfN] + rev
+		return palindrome
+	}
+
+	palindrome := n[:halfN+1] + rev
+	return palindrome
+}
+
+func revStr(subStr string) string {
+	rev := ""
+	for i := len(subStr) - 1; i >= 0; i-- {
+		rev += string(subStr[i])
+	}
+
+	return rev
 }
