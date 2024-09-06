@@ -25,12 +25,18 @@ type ListNode struct {
 }
 
 func modifiedList(nums []int, head *ListNode) *ListNode {
+	skipsMap := make(map[int]bool)
+	for _, v := range nums {
+		skipsMap[v] = true
+	}
+
 	dummy := &ListNode{Next: head}
 	prev := dummy
 	current := head
 
 	for current != nil {
-		if contains(nums, current.Val) {
+		_, found := skipsMap[current.Val]
+		if found {
 			prev.Next = current.Next
 		} else {
 			prev = current
@@ -39,15 +45,6 @@ func modifiedList(nums []int, head *ListNode) *ListNode {
 	}
 
 	return dummy.Next
-}
-
-func contains(nums []int, val int) bool {
-	for _, v := range nums {
-		if v == val {
-			return true
-		}
-	}
-	return false
 }
 
 func printLinkedList(head *ListNode) {
