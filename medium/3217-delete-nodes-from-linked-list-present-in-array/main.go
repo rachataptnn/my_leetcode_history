@@ -30,18 +30,15 @@ func modifiedList(nums []int, head *ListNode) *ListNode {
 		skipsMap[v] = true
 	}
 
-	dummy := &ListNode{Next: head}
-	prev := dummy
-	current := head
+	dummy := &ListNode{}
+	current := dummy
 
-	for current != nil {
-		_, found := skipsMap[current.Val]
-		if found {
-			prev.Next = current.Next
-		} else {
-			prev = current
+	for head != nil {
+		if !skipsMap[head.Val] {
+			current.Next = &ListNode{Val: head.Val}
+			current = current.Next
 		}
-		current = current.Next
+		head = head.Next
 	}
 
 	return dummy.Next
