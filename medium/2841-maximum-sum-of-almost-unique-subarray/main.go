@@ -36,11 +36,9 @@ func maxSum(nums []int, m int, k int) int64 {
 
 	for right <= len(nums) {
 		subArr := nums[left:right]
-		if isUniqEnough(subArr, m) {
-			sum := sumSubArr(subArr)
-			if max < sum {
-				max = sum
-			}
+		isUniqEnough, sum := isUniqEnough(subArr, m)
+		if isUniqEnough && max < sum {
+			max = sum
 		}
 
 		left++
@@ -50,26 +48,39 @@ func maxSum(nums []int, m int, k int) int64 {
 	return int64(max)
 }
 
-func isUniqEnough(subArr []int, m int) bool {
+func isUniqEnough(subArr []int, m int) (bool, int) {
 	freqMap := make(map[int]int)
 
-	for _, v := range subArr {
+	sum := 0
+	index := 0
+
+	for i, v := range subArr {
+		sum += v
 		freqMap[v]++
 		if len(freqMap) == m {
-			return true
+			index = i + 1
+			break
+			// return true
 		}
 		if freqMap[v] == m-1 {
-			return false
+			return false, 0
 		}
 	}
 
-	return false
+	if index > 0 {
+		for i := index; i < len(subArr); i++ {
+			sum += subArr[i]
+		}
+		return true, sum
+	}
+
+	return false, 0
 }
 
-func sumSubArr(subArr []int) int {
-	sum := 0
-	for _, v := range subArr {
-		sum += v
-	}
-	return sum
-}
+// func sumSubArr(subArr []int) int {
+// 	sum := 0
+// 	for _, v := range subArr {
+// 		sum += v
+// 	}
+// 	return sum
+// }
