@@ -1,8 +1,12 @@
-// https://leetcode.com/problems/find-bottom-left-tree-value/
-
 package main
 
+import "fmt"
+
 func main() {
+	// Example tree:
+	//      2
+	//     / \
+	//    2   3
 	root := &TreeNode{
 		Val: 2,
 	}
@@ -10,12 +14,26 @@ func main() {
 	root.Left = &TreeNode{
 		Val: 2,
 	}
+	root.Left.Left = &TreeNode{
+		Val: 4,
+	}
 
 	root.Right = &TreeNode{
 		Val: 3,
 	}
+	root.Right.Left = &TreeNode{
+		Val: 5,
+	}
+	root.Right.Right = &TreeNode{
+		Val: 6,
+	}
 
-	findBottomLeftValue(root)
+	root.Right.Left.Left = &TreeNode{
+		Val: 7,
+	}
+
+	result := findBottomLeftValue(root)
+	fmt.Println("Bottom-left value:", result)
 }
 
 type TreeNode struct {
@@ -25,11 +43,23 @@ type TreeNode struct {
 }
 
 func findBottomLeftValue(root *TreeNode) int {
-	s := states{}
+	s := &states{}
+	s.preOrderTraversal(root)
 
-	s.preOrderTraversal(root, 0)
+	if len(s.vwl) == 0 {
+		return root.Val
+	}
 
-	return 0
+	maxLevel := -1
+	leftMostVal := 0
+	for _, vwl := range s.vwl {
+		if vwl.level > maxLevel {
+			maxLevel = vwl.level
+			leftMostVal = vwl.val
+		}
+	}
+
+	return leftMostVal
 }
 
 type states struct {
@@ -42,22 +72,22 @@ type valWithLevel struct {
 	level int
 }
 
-func (s *states) preOrderTraversal(root *TreeNode, prevNodeVal int) {
+func (s *states) preOrderTraversal(root *TreeNode) {
 	if root == nil {
-		if prevNodeVal > 0 {
-			s.vwl = append(s.vwl, valWithLevel{
-				val:   prevNodeVal,
-				level: s.level,
-			})
-		}
-
-		// s.level -1
-
 		return
 	}
 
-	s.level += 1
+	isLeaf := root.Left == nil && root.Right == nil
+	if isLeaf {
+		s.vwl = append(s.vwl, valWithLevel{
+			val:   root.Val,
+			level: s.level,
+		})
+		return
+	}
 
-	s.preOrderTraversal(root.Left, root.Val) // Traverse left subtree
-	s.preOrderTraversal(root.Right, 0)       // Traverse right subtree
+	s.level++
+	s.preOrderTraversal(root.Left)
+	s.preOrderTraversal(root.Right)
+	s.level--
 }
