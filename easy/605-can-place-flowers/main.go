@@ -8,7 +8,10 @@ func main() {
 	// flowerbed := []int{1, 0, 0, 0, 1}
 
 	// 105/130
-	flowerbed := []int{1, 0, 0, 0, 0, 1}
+	// flowerbed := []int{1, 0, 0, 0, 0, 1}
+
+	// 119/130
+	flowerbed := []int{1, 0, 0, 0, 1, 0, 0}
 	n := 2
 
 	//                 0  1  2  3  4  5  6  7  8  9  0  1  2  3
@@ -21,11 +24,13 @@ func main() {
 func canPlaceFlowers(flowerbed []int, n int) bool {
 	unAvailableBed := countUnavailableBed(flowerbed)
 	availableBed := len(flowerbed) - len(unAvailableBed)
-	if availableBed%2 != 0 && availableBed != 1 {
+	if availableBed%2 != 0 {
 		availableBed = availableBed + 1
 	}
 
-	return availableBed >= n
+	plantAble := availableBed / 2
+
+	return plantAble >= n
 }
 
 func countUnavailableBed(flowerbed []int) map[int]bool {
