@@ -7,11 +7,11 @@ import "fmt"
 func main() {
 	// flowerbed := []int{1, 0, 0, 0, 1}
 
-	// 105/130
-	// flowerbed := []int{1, 0, 0, 0, 0, 1}
+	// 105/130         0  1  2  3  4  5
+	flowerbed := []int{1, 0, 0, 0, 0, 1}
 
 	// 119/130
-	flowerbed := []int{1, 0, 0, 0, 1, 0, 0}
+	// flowerbed := []int{1, 0, 0, 0, 1, 0, 0}
 	n := 2
 
 	//                 0  1  2  3  4  5  6  7  8  9  0  1  2  3
@@ -21,41 +21,41 @@ func main() {
 	fmt.Println(canPlaceFlowers(flowerbed, n))
 }
 
+// i can actually o(n) with one loop
+// add 0 to the start and the end of array flowerbed
+// then loop start at index 1 end at index-2
+// then check 3 condtions
+// if isPrevious == 1 || isCurrent ==1 || isNext == 1 {
+//   plantAble++
+//   i++
+// }
+
 func canPlaceFlowers(flowerbed []int, n int) bool {
 	unAvailableBed := countUnavailableBed(flowerbed)
-	availableBed := len(flowerbed) - len(unAvailableBed)
-	if availableBed%2 != 0 {
-		availableBed = availableBed + 1
-	}
 
-	plantAble := availableBed / 2
+	plantAble := 0
+	for i := 0; i < len(flowerbed); i++ {
+		if !unAvailableBed[i] {
+			plantAble++
+			i++
+			// fmt.Println("we can plant on:", i)
+		}
+	}
 
 	return plantAble >= n
 }
 
 func countUnavailableBed(flowerbed []int) map[int]bool {
 	unAvailableBed := make(map[int]bool)
-	if flowerbed[0] == 1 {
-		unAvailableBed[0] = true
-		unAvailableBed[1] = true
-	}
-	if flowerbed[len(flowerbed)-1] == 1 {
-		if len(flowerbed)-2 >= 0 {
-			unAvailableBed[len(flowerbed)-2] = true
-		}
-		unAvailableBed[len(flowerbed)-1] = true
-	}
-
-	for currentBed := 1; currentBed < len(flowerbed)-2; currentBed++ {
+	for currentBed := 0; currentBed < len(flowerbed); currentBed++ {
 		if flowerbed[currentBed] == 1 {
 			previousBed := currentBed - 1
 			unAvailableBed[previousBed] = true
+
 			unAvailableBed[currentBed] = true
 
-			if currentBed+1 < len(flowerbed) {
-				nextBed := currentBed + 1
-				unAvailableBed[nextBed] = true
-			}
+			nextBed := currentBed + 1
+			unAvailableBed[nextBed] = true
 		}
 	}
 
