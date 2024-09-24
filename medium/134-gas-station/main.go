@@ -5,11 +5,11 @@ package main
 import "fmt"
 
 func main() {
-	gas := []int{1, 2, 3, 4, 5}
-	cost := []int{3, 4, 5, 1, 2}
+	// gas := []int{1, 2, 3, 4, 5}
+	// cost := []int{3, 4, 5, 1, 2}
 
-	// gas := []int{2, 3, 4}
-	// cost := []int{3, 4, 3}
+	gas := []int{2, 3, 4}
+	cost := []int{3, 4, 3}
 
 	// 21/39
 	// gas := []int{5, 1, 2, 3, 4}
@@ -23,65 +23,31 @@ func main() {
 }
 
 func canCompleteCircuit(gas []int, cost []int) int {
-	s := states{
-		useGas:       cost,
-		fillGas:      gas,
-		totalStation: len(gas),
-	}
+	totalGas, totalCost := 0, 0
+	gasLeftInTank := 0
+	start := 0 // at first, lets assume that the first station(index 0) is the answer
 
-	for currentStation := 0; currentStation < len(gas); currentStation++ {
-		s.gasLeft = s.fillGas[currentStation]
-		if s.isCircuitPossible(currentStation) {
-			return currentStation
-		}
-	}
-
-	return -1
-}
-
-type states struct {
-	gasLeft      int
-	useGas       []int
-	fillGas      []int
-	totalStation int
-}
-
-func (s *states) isCircuitPossible(firstStation int) bool {
-	checkInCount := 0
-
-	if firstStation == 3 {
-		fmt.Println("")
-	}
-
-	for checkInCount != s.totalStation {
-		station := firstStation + checkInCount
-		if station >= s.totalStation {
-			station = abs(s.totalStation, station)
+	for i := 0; i < len(gas); i++ {
+		gasLeftInTank += gas[i] - cost[i]
+		if gasLeftInTank < 0 { // and then just iterate till we found that start with index 0 is not possible because the tank is no gas left(gas<0)
+			start = i + 1
+			gasLeftInTank = 0 // these 2 lines is just reset, lets assume that the next station is the answer
 		}
 
-		useGas := s.useGas[station]
-		s.gasLeft -= useGas
-		if s.gasLeft >= 0 {
-			nextStation := station + 1
-			if nextStation >= s.totalStation {
-				nextStation = 0
-			}
-
-			recievedGas := s.fillGas[nextStation]
-			s.gasLeft += recievedGas
-			checkInCount++
-		} else {
-			return false
-		}
+		totalGas += gas[i]
+		totalCost += cost[i]
 	}
 
-	return true
-}
-
-func abs(a, b int) int {
-	res := a - b
-	if res < 0 {
-		return -res
+	if totalGas < totalCost {
+		return -1
 	}
-	return res
+	// if we comment this condition, the test case below would got answer = 2
+	// gas := []int{2, 3, 4}
+	// cost := []int{3, 4, 3}
+	// which is wrong, it is not possible to run because
+	// sumGas = 9
+	// sumCost = 10
+	// the gas is not enough
+
+	return start
 }
