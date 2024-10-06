@@ -8,8 +8,11 @@ func main() {
 	// clips := [][]int{{0, 2}, {4, 6}, {8, 10}, {1, 9}, {1, 5}, {5, 9}}
 	// time := 10
 
-	clips := [][]int{{0, 1}, {6, 8}, {0, 2}, {5, 6}, {0, 4}, {0, 3}, {6, 7}, {1, 3}, {4, 7}, {1, 4}, {2, 5}, {2, 6}, {3, 4}, {4, 5}, {5, 7}, {6, 9}}
-	time := 9
+	// clips := [][]int{{0, 1}, {6, 8}, {0, 2}, {5, 6}, {0, 4}, {0, 3}, {6, 7}, {1, 3}, {4, 7}, {1, 4}, {2, 5}, {2, 6}, {3, 4}, {4, 5}, {5, 7}, {6, 9}}
+	// time := 9
+
+	clips := [][]int{{0, 4}, {2, 8}}
+	time := 5
 
 	fmt.Println(videoStitching(clips, time))
 }
@@ -26,6 +29,10 @@ func videoStitching(clips [][]int, time int) int {
 	for _, clip := range clips {
 		s.currentClip.start = clip[0]
 		s.currentClip.end = clip[1]
+
+		if s.currentClip.end > s.n {
+			s.currentClip.end = s.n
+		}
 		s.currentClip.length = s.currentClip.end - s.currentClip.start
 
 		if s.isClipBestStart() {
@@ -108,26 +115,20 @@ func (s *states) isPath() bool {
 // case n
 
 func (s *states) findMinimumNForConnect() int {
-	// pathCount := 0
+	candidatePaths := []clipDetail{}
 
-	// candidatePaths := []clipDetail{}
-	// max := 0
+	// case need 1 path
+	for _, path := range s.paths {
+		if path.end >= s.bestEnd.start {
+			return 1
+		}
 
-	// // case need 1 path
-	// for _, path := range s.paths {
-	// 	if path.end >= s.bestEnd.start {
-	// 		return 1
-	// 	}
-
-	// 	if (path.end - s.bestStart.end) > max {
-
-	// 	}
-
-	// 	afterBS := s.currentClip.end > s.bestStart.end
-	// 	beforeBE := s.currentClip.start < s.bestEnd.start
-	// 	if afterBS || beforeBE {
-	// 	}
-	// }
+		afterBS := s.currentClip.end > s.bestStart.end
+		beforeBE := s.currentClip.start < s.bestEnd.start
+		if afterBS || beforeBE {
+			candidatePaths = append(candidatePaths, path)
+		}
+	}
 
 	return 0
 }
