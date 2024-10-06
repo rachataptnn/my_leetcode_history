@@ -11,8 +11,14 @@ func main() {
 	// clips := [][]int{{0, 1}, {6, 8}, {0, 2}, {5, 6}, {0, 4}, {0, 3}, {6, 7}, {1, 3}, {4, 7}, {1, 4}, {2, 5}, {2, 6}, {3, 4}, {4, 5}, {5, 7}, {6, 9}}
 	// time := 9
 
-	clips := [][]int{{0, 4}, {2, 8}}
-	time := 5
+	// clips := [][]int{{0, 4}, {2, 8}}
+	// time := 5
+
+	// clips := [][]int{{0, 2}, {4, 8}}
+	// time := 5
+
+	clips := [][]int{{0, 5}, {1, 6}, {2, 7}, {3, 8}, {4, 9}, {5, 10}, {6, 11}, {7, 12}, {8, 13}, {9, 14}, {10, 15}, {11, 16}, {12, 17}, {13, 18}, {14, 19}, {15, 20}, {16, 21}, {17, 22}, {18, 23}, {19, 24}, {20, 25}, {21, 26}, {22, 27}, {23, 28}, {24, 29}, {25, 30}, {26, 31}, {27, 32}, {28, 33}, {29, 34}, {30, 35}, {31, 36}, {32, 37}, {33, 38}, {34, 39}, {35, 40}, {36, 41}, {37, 42}, {38, 43}, {39, 44}, {40, 45}, {41, 46}, {42, 47}, {43, 48}, {44, 49}, {45, 50}, {46, 51}, {47, 52}, {48, 53}, {49, 54}}
+	time := 50
 
 	fmt.Println(videoStitching(clips, time))
 }
@@ -69,8 +75,11 @@ func videoStitching(clips [][]int, time int) int {
 
 	// case n
 	pathAmount := s.findMinimumNForConnect()
+	if pathAmount != 0 {
+		return 2 + pathAmount
+	}
 
-	return 2 + pathAmount
+	return -1
 }
 
 type states struct {
@@ -117,18 +126,17 @@ func (s *states) isPath() bool {
 func (s *states) findMinimumNForConnect() int {
 	candidatePaths := []clipDetail{}
 
-	// case need 1 path
 	for _, path := range s.paths {
-		if path.end >= s.bestEnd.start {
+		if path.start <= s.bestStart.end && path.end >= s.bestEnd.start {
 			return 1
 		}
 
-		afterBS := s.currentClip.end > s.bestStart.end
-		beforeBE := s.currentClip.start < s.bestEnd.start
-		if afterBS || beforeBE {
+		if path.end > s.bestStart.end || path.start < s.bestEnd.start {
 			candidatePaths = append(candidatePaths, path)
 		}
 	}
 
 	return 0
 }
+
+// maybe i should take a rest
