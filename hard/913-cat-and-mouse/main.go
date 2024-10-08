@@ -12,7 +12,7 @@ import (
 
 // Example usage:
 func main() {
-	// graph := [][]int{{2, 5}, {3}, {0, 4, 5}, {1, 4, 5}, {2, 3}, {0, 2, 3}}
+	graph := [][]int{{2, 5}, {3}, {0, 4, 5}, {1, 4, 5}, {2, 3}, {0, 2, 3}}
 
 	// graph := [][]int{{1, 3}, {0}, {3}, {0, 2}}
 
@@ -20,7 +20,10 @@ func main() {
 	// graph := [][]int{{3, 4}, {3, 5}, {3, 6}, {0, 1, 2}, {0, 5, 6}, {1, 4}, {2, 4}}
 
 	// 51/92
-	graph := [][]int{{2, 3}, {2}, {0, 1}, {0, 4}, {3}}
+	// graph := [][]int{{2, 3}, {2}, {0, 1}, {0, 4}, {3}}
+
+	// 33/92
+	// graph := [][]int{{2, 3}, {3, 4}, {0, 4}, {0, 1}, {1, 2}}
 
 	fmt.Println(catMouseGame(graph))
 }
@@ -135,7 +138,9 @@ func (s *states) sortNearZeroNodes() {
 }
 
 func (s *states) updateDangerNodes() {
-	dangerNode := map[int]bool{}
+	dangerNode := map[int]bool{
+		s.catPosition: true,
+	}
 	for node, steps := range s.dp[s.catPosition] {
 		if steps == 1 && node != 0 {
 			dangerNode[node] = true
@@ -164,6 +169,8 @@ func (s *states) ratMove() {
 		}
 	}
 }
+
+func test()
 
 func (s *states) ratFindNode() int {
 	possibleNodes := map[int]bool{}
@@ -217,9 +224,9 @@ func (s *states) catMove() {
 	}
 
 	if len(candidateNodes) == 1 {
-		s.catPosition = candidateNodes[0].node
-		s.catFreqVisit[candidateNodes[0].node]++
-		if s.catFreqVisit[candidateNodes[0].node] > 3 {
+		s.catPosition = candidateNodes[firstCandidate].node
+		s.catFreqVisit[candidateNodes[firstCandidate].node]++
+		if s.catFreqVisit[candidateNodes[firstCandidate].node] > 3 {
 			s.winner = 0
 			return
 		}
@@ -228,9 +235,9 @@ func (s *states) catMove() {
 		for _, v := range s.nearZeroNodes {
 			_, ok := candidateNodes[v.node]
 			if ok {
-				s.catPosition = candidateNodes[0].node
-				s.catFreqVisit[candidateNodes[0].node]++
-				if s.catFreqVisit[candidateNodes[0].node] > 3 {
+				s.catPosition = candidateNodes[v.node].node
+				s.catFreqVisit[candidateNodes[v.node].node]++
+				if s.catFreqVisit[candidateNodes[v.node].node] > 3 {
 					s.winner = 0
 					return
 				}
