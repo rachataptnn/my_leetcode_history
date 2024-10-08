@@ -1,266 +1,98 @@
 // https://leetcode.com/problems/cat-and-mouse/description/
 
+// solution visualized
+// https://docs.google.com/spreadsheets/d/1b9A_IwCgyHmhLKBWiE4h2X3O2uwxvchtJfSPDNLcqKc/edit?gid=0#gid=0
+
 package main
 
-import (
-	"fmt"
-	"sort"
-)
-
-type gameStates struct {
-	graph         [][]int
-	catPosition   int
-	mousePosition int
-	winner        int
-
-	skipIndexes        []int
-	mousePath          []int
-	mousePaths         [][]int
-	oneStepToHoleNodes []int
-
-	mouseWasPassNode map[int]int
-	catWasPassNode   map[int]int
-}
+import "fmt"
 
 func main() {
-	// input := [][]int{{2, 5}, {3}, {0, 4, 5}, {1, 4, 5}, {2, 3}, {0, 2, 3}}
-	// input := [][]int{{1, 3}, {0}, {3}, {0, 2}}
+	graph := [][]int{
+		{3, 4},
+		{3, 5},
+		{3, 6},
+		{0, 1, 2},
+		{0, 5, 6},
+		{1, 4},
+		{2, 4},
+	}
 
-	// my first invalid case 11/92
-	input := [][]int{{3, 4}, {3, 5}, {3, 6}, {0, 1, 2}, {0, 5, 6}, {1, 4}, {2, 4}}
-
-	result := catMouseGame(input)
-	fmt.Println("winner: ", result)
+	fmt.Println(catMouseGame(graph))
 }
 
+// expected output
+// 1-mouse
+// 2-cat
+// 0-draw If ever a position is repeated
 func catMouseGame(graph [][]int) int {
-	gs := gameStates{
-		graph:         graph,
-		mousePosition: 1,
-		catPosition:   2,
-		winner:        -1,
+	n := len(graph)
+	possiblePathCount := (n * n) - n
+
+	s := states{
+		graph:           graph,
+		possiblePathCnt: possiblePathCount,
 	}
 
-	mwp := make(map[int]int)
-	cwp := make(map[int]int)
-	mwp[1] = 1
-	cwp[2] = 1
-	gs.mouseWasPassNode = mwp
-	gs.catWasPassNode = cwp
-
-	gs.initMousePaths()
-	sort2DArrayByLen(gs.mousePaths)
-
-	fmt.Println("MOUSE: ", gs.mousePosition)
-	fmt.Println("CAT: ", gs.catPosition)
-
-	round := 0
-	for {
-		gs.mouseDecidingMove()
-		fmt.Println("MOUSE: ", gs.mousePosition)
-		if gs.mousePosition == 0 {
-			gs.winner = 1
-			break
-		}
-
-		gs.catDecidingMove()
-		fmt.Println("CAT: ", gs.catPosition)
-
-		if gs.winner != -1 {
-			break
-		}
-		// fmt.Println(round)
-
-		round++
-	}
-
-	return gs.winner
-}
-
-func (gs *gameStates) mouseDecidingMove() {
-	if gs.isHoleReachable() {
-		gs.winner = 1
-	}
-
-	for _, path := range gs.mousePaths {
-		if gs.isPathSafe(path) {
-			gs.mousePosition = gs.mouseForwardToThisPath(path)
-			gs.mouseWasPassNode[gs.mousePosition] += 1
-			if gs.mouseWasPassNode[gs.mousePosition] >= 10 {
-				gs.winner = 0
-			}
-			return
-		}
-	}
-
-	gs.mousePosition = gs.findSafeNode()
-
-}
-
-func (gs *gameStates) isHoleReachable() bool {
-	for _, v := range gs.oneStepToHoleNodes {
-		if gs.mousePosition == v {
-			return true
-		}
-	}
-
-	return false
-}
-
-func (gs *gameStates) isPathSafe(path []int) bool {
-	for _, node := range path {
-		if node == gs.catPosition {
-			return false
-		}
-	}
-
-	return true
-}
-
-func (gs *gameStates) findSafeNode() int {
-	safePath := []int{}
-
-	for _, path := range gs.mousePaths {
-		for j, node := range path {
-			jumpToCat := gs.catPosition == node
-			nextRoundCatched := gs.isCatchable(node)
-			if jumpToCat || nextRoundCatched {
-				break
-			}
-
-			if j+1 == len(path) {
-				safePath = path
-			}
-		}
-	}
-
-	if len(safePath) > 0 {
-		node := gs.mouseForwardToThisPath(safePath)
-		return node
-	}
+	s.initMatrixZeros(len(graph))
+	s.fillStepsIntoDP(graph)
 
 	return 0
 }
 
-func (gs *gameStates) mouseForwardToThisPath(path []int) int {
-	for i, node := range path {
-		if node == gs.mousePosition {
-			return path[i-1]
-		}
+func (s *states) initMatrixZeros(n int) {
+	matrix := make([][]int, n)
+	for i := range matrix {
+		matrix[i] = make([]int, n)
 	}
 
-	for i, path := range gs.graph {
-		if i == gs.mousePosition {
-			for _, node := range path {
-				if node != gs.catPosition {
-					return node
-				}
+	s.dp = matrix
+}
+
+type states struct {
+	graph [][]int
+	dp    [][]int
+
+	possiblePathCnt   int
+	calculatedPathCnt int
+}
+
+// DP contains the minimum step btw currentNode and destinationNode
+func (s *states) fillStepsIntoDP(graph [][]int) [][]int {
+
+	// this would be recursive for sure
+
+	level2Nodes := [][]int{}
+	for i, v := range graph {
+		level2Nodes = append(level2Nodes, v)
+		for _, node := range v {
+			if s.dp[i][node] == 0 {
+				s.dp[i][node] = 1
 			}
 		}
 	}
 
-	return 0
-}
+	// level3Nodes := [][]int{}
+	// for i, v := range level2Nodes {
+	// 	level3Nodes = append(level3Nodes, v)
+	// 	for _, node := range v {
+	// 		if s.dp[i][node] == 0 {
+	// 			s.dp[i][node] = 2
+	// 		}
+	// 	}
+	// }
 
-// CAT DECIDING
-func (gs *gameStates) catDecidingMove() {
-	if gs.isCatchable(gs.mousePosition) {
-		gs.winner = 2
-	}
+	// level4Nodes := [][]int{}
+	// for i, v := range level3Nodes {
+	// 	level4Nodes = append(level4Nodes, v)
+	// 	for _, node := range v {
+	// 		if s.dp[i][node] == 0 {
+	// 			s.dp[i][node] = 3
+	// 		}
+	// 	}
+	// }
 
-	gs.catPosition = gs.getBlockNode()
-	gs.catWasPassNode[gs.catPosition] += 1
-	if gs.catWasPassNode[gs.catPosition] >= 10 {
-		gs.winner = 0
-	}
-}
+	// this would be recursive for sure
 
-func (gs *gameStates) isCatchable(mousePosition int) bool {
-	for _, possibleNode := range gs.graph[gs.catPosition] {
-		if possibleNode == mousePosition {
-			return true
-		}
-	}
-	return false
-}
-
-// BLOCKING STRATEGY
-// How we map set to set
-// input(mousePosition=4) return 2
-// -> ถ้าหนูเดินผ่าน 2 ไป 0 (2 step) lesser!!
-// -> ถ้าหนูเดินผ่าน 5 ไป 0 (3 step)
-
-// input(mousePosition=3) return 5
-// -> ถ้าหนูเดินผ่าน 2 ไป 0 (3 step)
-// -> ถ้าหนูเดินผ่าน 5 ไป 0 (2 step) lesser!!
-func (gs *gameStates) getBlockNode() int {
-	possiblePath := gs.getMousePossiblePath()
-	sort2DArrayByLen(possiblePath)
-
-	predictMousePosition := gs.mouseForwardToThisPath(possiblePath[0])
-	return predictMousePosition
-}
-
-func (gs *gameStates) getMousePossiblePath() (possiblePath [][]int) {
-	for _, path := range gs.mousePaths {
-		for _, node := range path {
-			if node == gs.mousePosition {
-				possiblePath = append(possiblePath, path)
-			}
-		}
-	}
-
-	return possiblePath
-}
-
-// INIT: mouse possible paths
-func (gs *gameStates) initMousePaths() {
-	for i := 0; i < len(gs.graph); i++ {
-		foundMap := make(map[int]bool)
-		gs.findNextNodes(0, foundMap)
-		if len(gs.mousePath) > 0 {
-			gs.mousePaths = append(gs.mousePaths, gs.mousePath)
-		}
-		gs.mousePath = []int{}
-	}
-}
-
-func (gs *gameStates) findNextNodes(currentTarget int, foundMap map[int]bool) []int {
-	for srcIndex, srcNode := range gs.graph {
-		for _, desNode := range srcNode {
-			if skipThisIndex(srcIndex, gs.skipIndexes) {
-				continue
-			}
-			_, isFound := foundMap[srcIndex]
-			if desNode == currentTarget && !isFound {
-				if len(gs.mousePath) == 0 { // initiate case
-					gs.mousePath = append(gs.mousePath, 0)
-					gs.skipIndexes = append(gs.skipIndexes, srcIndex)
-					gs.oneStepToHoleNodes = append(gs.oneStepToHoleNodes, srcIndex)
-				}
-
-				gs.mousePath = append(gs.mousePath, srcIndex)
-				foundMap[currentTarget] = true
-				return gs.findNextNodes(srcIndex, foundMap)
-			}
-		}
-	}
-
-	return gs.mousePath
-}
-
-func skipThisIndex(srcIndex int, needSkipIndexs []int) bool {
-	for _, v := range needSkipIndexs {
-		if srcIndex == v {
-			return true
-		}
-	}
-
-	return false
-}
-
-func sort2DArrayByLen(arr [][]int) {
-	sort.Slice(arr, func(i, j int) bool {
-		return len(arr[i]) < len(arr[j])
-	})
+	return nil
 }
