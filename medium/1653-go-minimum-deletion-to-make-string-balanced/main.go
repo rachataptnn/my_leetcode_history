@@ -1,3 +1,5 @@
+package main
+
 // https://leetcode.com/problems/minimum-deletions-to-make-string-balanced/description/?envType=daily-question&envId=2024-07-30
 
 // rip me ;-;
