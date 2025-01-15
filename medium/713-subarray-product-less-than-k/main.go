@@ -7,26 +7,18 @@ func main() {
 }
 
 func numSubarrayProductLessThanK(nums []int, k int) int {
-	cnt := 0
-	n := len(nums)
-	for start := 0; start < n; start++ {
-		for end := start; end < n; end++ {
-			subarray := nums[start : end+1]
+	var left, totalCount int
+	product := 1
 
-			product := 1
-			isOver := false
-			for _, v := range subarray {
-				product *= v
-				if product >= k {
-					isOver = true
-					break
-				}
-			}
-			if !isOver {
-				cnt++
-			}
+	for right := 0; right < len(nums); right++ {
+		product *= nums[right]
+		for left <= right && product >= k {
+			product /= nums[left]
+			left++
 		}
+
+		totalCount += right - left + 1
 	}
 
-	return cnt
+	return totalCount
 }
