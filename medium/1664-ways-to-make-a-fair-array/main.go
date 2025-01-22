@@ -9,36 +9,32 @@ func main() {
 }
 
 func waysToMakeFair(nums []int) int {
-	cnt := 0
-	for i := range nums {
-		sumOdd := 0
-		sumEven := 0
+	sumOdd := 0
+	sumEven := 0
 
-		isSwap := false
-		for j, v2 := range nums {
-			if j == i {
-				isSwap = true
-				continue
-			}
+	fairCnt := 0
 
-			if isSwap {
-				if j%2 == 0 {
-					sumOdd += v2
-				} else {
-					sumEven += v2
-				}
-			} else {
-				if j%2 == 0 {
-					sumEven += v2
-				} else {
-					sumOdd += v2
-				}
-			}
-
-		}
-		if sumOdd == sumEven {
-			cnt++
+	for i, v := range nums {
+		if i%2 == 0 {
+			sumOdd += v
+		} else {
+			sumEven += v
 		}
 	}
-	return cnt
+
+	for i, v := range nums {
+		if i%2 == 0 {
+			tmpSumEven := sumEven - v
+			if tmpSumEven == sumOdd {
+				fairCnt++
+			}
+		} else {
+			tmpSumOdd := sumOdd - v
+			if tmpSumOdd == sumEven {
+				fairCnt++
+			}
+		}
+	}
+
+	return fairCnt
 }
