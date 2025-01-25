@@ -1,14 +1,20 @@
 package main
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
 func main() {
-	lengthOfLastWord("Hello World")
+	// lengthOfLastWord("Hello World")
+
+	// 50/59
+	fmt.Println(lengthOfLastWord("a"))
 }
 
 func lengthOfLastWord(s string) int {
 	split := strings.Split(s, " ")
-	for i := len(split) - 1; i > 0; i-- {
+	for i := len(split) - 1; i >= 0; i-- {
 		if split[i] != "" {
 			return len(split[i])
 		}
