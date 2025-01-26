@@ -6,7 +6,13 @@ func main() {
 	// fmt.Println(closestPrimes(10, 19))
 
 	// pass 38/66
-	fmt.Println(closestPrimes(19, 31))
+	// fmt.Println(closestPrimes(19, 31))
+
+	// pass 65/66
+	// fmt.Println(closestPrimes(850350, 851803))
+
+	// pass 66/66
+	fmt.Println(closestPrimes(850350, 851803))
 }
 
 func closestPrimes(left int, right int) []int {
@@ -21,20 +27,22 @@ func closestPrimes(left int, right int) []int {
 	firstRes := -1
 	secondRes := -1
 
-	for i := left; i < right; i++ {
-		if isPrime(i) && firstIndex == -1 && secondIndex == -1 {
-			firstIndex = i
-		} else if isPrime(i) {
-			secondIndex = i
+	for i := left; i <= right; i++ {
+		if isPrime(i) {
+			if firstIndex == -1 && secondIndex == -1 {
+				firstIndex = i
+			} else {
+				secondIndex = i
 
-			tmpMin := secondIndex - firstIndex
-			if tmpMin < min {
-				min = tmpMin
-				firstRes, secondRes = firstIndex, secondIndex
+				tmpMin := secondIndex - firstIndex
+				if tmpMin < min {
+					min = tmpMin
+					firstRes, secondRes = firstIndex, secondIndex
+				}
+
+				firstIndex = i
+				secondIndex = -1
 			}
-
-			firstIndex = i
-			secondIndex = -1
 		}
 	}
 
