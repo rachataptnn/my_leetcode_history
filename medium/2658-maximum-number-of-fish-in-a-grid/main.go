@@ -9,38 +9,25 @@ func main() {
 }
 
 func findMaxFish(grid [][]int) int {
-	rowAmt, colAmt := len(grid), len(grid[0])
-	max := 0
+	var (
+		dfs      func(int, int) int
+		maxCatch int
+	)
 
-	for r, row := range grid {
-		for c := range row {
-			// if cell != 0 {
-			catchedFish := fishing(r, c, rowAmt, colAmt, grid)
-			if catchedFish > max {
-				max = catchedFish
-			}
-			// }
+	dfs = func(row, col int) int {
+		if row < 0 || col < 0 || row == len(grid) || col == len(grid[0]) || grid[row][col] == 0 {
+			return 0
+		}
+
+		fish := grid[row][col]
+		grid[row][col] = 0
+		return fish + dfs(row, col+1) + dfs(row+1, col) + dfs(row-1, col) + dfs(row, col-1)
+	}
+
+	for row := 0; row < len(grid); row++ {
+		for col := 0; col < len(grid[0]); col++ {
+			maxCatch = max(maxCatch, dfs(row, col))
 		}
 	}
-
-	return max
-}
-
-func fishing(r, c, rowAmt, colAmt int, grid [][]int) int {
-	topFish, btmFish, lftFish, rgtFish := 0, 0, 0, 0
-
-	if r-1 >= 0 {
-		topFish += grid[r-1][c]
-	}
-	if r+1 < rowAmt {
-		btmFish += grid[r+1][c]
-	}
-	if c-1 >= 0 {
-		lftFish += grid[r][c-1]
-	}
-	if c+1 < colAmt {
-		lftFish += grid[r][c+1]
-	}
-
-	return topFish + btmFish + lftFish + rgtFish
+	return maxCatch
 }
