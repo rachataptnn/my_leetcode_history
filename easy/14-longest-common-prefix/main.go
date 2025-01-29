@@ -7,39 +7,44 @@ func main() {
 	// Output: "fl"
 
 	// 80/126
-	strs := []string{"ab", "a"}
+	// strs := []string{"ab", "a"}
+
+	// 118/126
+	strs := []string{"reflower", "flow", "flight"}
 
 	fmt.Println(longestCommonPrefix(strs))
 }
 
 func longestCommonPrefix(strs []string) string {
-	firstWord := strs[0]
 	n := len(strs)
 	if n == 1 {
-		return firstWord
+		return strs[0]
 	}
 
-	for i := 0; i < len(firstWord); i++ {
-		tmpFW := firstWord[:len(firstWord)-i]
-		nTmpFW := len(tmpFW)
+	shortestWord := ""
+	min := 201
+	for _, v := range strs {
+		if len(v) < min {
+			min = len(v)
+			shortestWord = v
+		}
+	}
+
+	for i := 0; i < len(shortestWord); i++ {
+		tmpSW := shortestWord[:len(shortestWord)-i]
+		nTmpSW := len(tmpSW)
 		commonPrefixCnt := 0
 
 		for j := 1; j < n; j++ {
-			// if len(strs[j]) != len(tmpFW) {
-			subWord := ""
-			if len(strs[j]) > nTmpFW {
-				subWord = strs[j][:nTmpFW]
-			} else if len(strs[j]) < nTmpFW {
-				continue
-			}
+			subWord := strs[j][:nTmpSW]
 
-			if subWord == tmpFW {
+			if subWord == tmpSW {
 				commonPrefixCnt++
 			}
 		}
 
 		if commonPrefixCnt+1 == len(strs) {
-			return tmpFW
+			return tmpSW
 		}
 	}
 
