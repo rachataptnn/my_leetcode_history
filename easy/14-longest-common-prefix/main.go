@@ -3,14 +3,14 @@ package main
 import "fmt"
 
 func main() {
-	// strs := []string{"flower", "flow", "flight"}
+	strs := []string{"flower", "flow", "flight"}
 	// Output: "fl"
 
 	// 80/126
 	// strs := []string{"ab", "a"}
 
 	// 118/126
-	strs := []string{"reflower", "flow", "flight"}
+	// strs := []string{"reflower", "flow", "flight"}
 
 	fmt.Println(longestCommonPrefix(strs))
 }
@@ -35,7 +35,7 @@ func longestCommonPrefix(strs []string) string {
 		nTmpSW := len(tmpSW)
 		commonPrefixCnt := 0
 
-		for j := 1; j < n; j++ {
+		for j := 0; j < n; j++ {
 			subWord := strs[j][:nTmpSW]
 
 			if subWord == tmpSW {
@@ -43,7 +43,7 @@ func longestCommonPrefix(strs []string) string {
 			}
 		}
 
-		if commonPrefixCnt+1 == len(strs) {
+		if commonPrefixCnt == len(strs) {
 			return tmpSW
 		}
 	}
