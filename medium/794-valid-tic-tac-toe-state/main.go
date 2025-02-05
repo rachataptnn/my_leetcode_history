@@ -3,7 +3,29 @@ package main
 import "fmt"
 
 func main() {
-	board := []string{"XOX", "O O", "XOX"}
+	// board := []string{"XOX", "O O", "XOX"}
+
+	// 105/111
+	// board := []string{"XO ", "XO ", "XO "}
+
+	// 105/111
+	// board := []string{
+	// 	"XXX",
+	// 	"OOX",
+	// 	"OOX"}
+
+	// 107/111
+	// board := []string{
+	// 	"XXX",
+	// 	"XOO",
+	// 	"OO "}
+
+	// 108/111
+	board := []string{
+		"OXX",
+		"XOX",
+		"OXO"}
+
 	fmt.Println(validTicTacToe(board))
 }
 
@@ -28,32 +50,36 @@ func validTicTacToe(board []string) bool {
 		return false
 	}
 
-	sus := isSusWin(board)
+	xWin, oWin := isSusWin(board)
+	susWin := xWin > 2 || oWin > 2 || (xWin > 0 && oWin > 0)
+	if susWin {
+		return false
+	}
 
-	return !sus
+	if xWin == 1 && (oCnt >= xCnt) {
+		return false
+	}
+
+	return true
 }
 
-func isSusWin(board []string) bool {
+func isSusWin(board []string) (int, int) {
 	xWin := 0
 	oWin := 0
 
 	firstCol := ""
 	secCol := ""
 	thirdCol := ""
-	for i, row := range board {
+	for _, row := range board {
 		if row == "XXX" {
 			xWin++
 		} else if row == "OOO" {
 			oWin++
 		}
 
-		if i == 0 {
-			firstCol += string(row[i])
-		} else if i == 1 {
-			secCol += string(row[i])
-		} else {
-			thirdCol += string(row[i])
-		}
+		firstCol += string(row[0])
+		secCol += string(row[1])
+		thirdCol += string(row[2])
 	}
 
 	if firstCol == "XXX" || secCol == "XXX" || thirdCol == "XXX" {
@@ -63,7 +89,5 @@ func isSusWin(board []string) bool {
 		oWin++
 	}
 
-	susWin := xWin > 1 || oWin > 1 || (xWin > 0 && oWin > 0)
-
-	return susWin
+	return xWin, oWin
 }
