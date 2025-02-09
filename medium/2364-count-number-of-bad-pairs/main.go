@@ -7,16 +7,17 @@ func main() {
 	fmt.Println(countBadPairs(nums))
 }
 
-func countBadPairs(nums []int) int64 {
-	badPairCnt := 0
+func countBadPairs(nums []int) int {
+	n := len(nums)
+	totalPairs := n * (n - 1) / 2
+	diffCount := make(map[int]int)
 
-	for i := 0; i < len(nums); i++ {
-		for j := i + 1; j < len(nums); j++ {
-			if i < j && (j-i) != nums[j]-nums[i] {
-				badPairCnt++
-			}
-		}
+	for i, num := range nums {
+		diff := num - i
+		totalPairs -= diffCount[diff]
+		diffCount[diff]++
+		fmt.Println("breakpoint")
 	}
 
-	return int64(badPairCnt)
+	return totalPairs
 }
