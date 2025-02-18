@@ -16,8 +16,9 @@ func main() {
 func firstCompleteIndex(arr []int, mat [][]int) int {
 	ijCell := initMap(mat)
 
-	rowGoal := len(mat)
-	colGoal := len(mat[0])
+	// pass 1055 / 1058 testcases passed:TIME LIMIT EXCEED
+	colGoal := len(mat)
+	rowGoal := len(mat[0])
 	for ii, v := range arr {
 		ij := ijCell[v]
 		i := ij[0]
