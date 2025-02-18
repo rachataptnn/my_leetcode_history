@@ -10,24 +10,35 @@ func main() {
 	arr := []int{1, 4, 5, 2, 6, 3}
 	mat := [][]int{{4, 3, 5}, {1, 2, 6}}
 
+	// 1055/1058
+	// some really long long arrs
 	fmt.Println(firstCompleteIndex(arr, mat))
 }
 
 func firstCompleteIndex(arr []int, mat [][]int) int {
 	ijCell := initMap(mat)
 
-	// pass 1055 / 1058 testcases passed:TIME LIMIT EXCEED
 	colGoal := len(mat)
 	rowGoal := len(mat[0])
+
+	iMap := make(map[int]int)
+	jMap := make(map[int]int)
+
 	for ii, v := range arr {
 		ij := ijCell[v]
 		i := ij[0]
 		j := ij[1]
 
-		mat[i][j] = -1
-		if isCompletelyPainted(mat, i, j, rowGoal, colGoal) {
+		iMap[i]++
+		if iMap[i] >= rowGoal {
 			return ii
 		}
+
+		jMap[j]++
+		if jMap[j] >= colGoal {
+			return ii
+		}
+
 	}
 
 	return 0
@@ -43,28 +54,4 @@ func initMap(mat [][]int) map[int][]int {
 	}
 
 	return ijCell
-}
-
-func isCompletelyPainted(mat [][]int, i, j, rowGoal, colGoal int) bool {
-	rowPainted := 0
-	colPainted := 0
-	for ii, row := range mat {
-		for jj, cell := range row {
-			if cell == -1 && ii == i {
-				rowPainted++
-				if rowPainted == rowGoal {
-					return true
-				}
-			}
-
-			if cell == -1 && jj == j {
-				colPainted++
-				if colPainted == colGoal {
-					return true
-				}
-			}
-		}
-	}
-
-	return false
 }
