@@ -9,8 +9,13 @@ func main() {
 	// 	{'1', '1', '1', '1', '1'},
 	// 	{'1', '0', '0', '1', '0'}} // Output: 6
 
+	// matrix := [][]byte{
+	// 	{'1'}} // Output: 1
+
+	// 42/74
 	matrix := [][]byte{
-		{'1'}} // Output: 1
+		{'0', '1'}} // Output: 1
+
 	fmt.Println(maximalRectangle(matrix))
 }
 
@@ -40,32 +45,31 @@ func maximalRectangle(matrix [][]byte) int {
 }
 
 func getContinuousLines(floor []byte) (lines []line) {
-	if len(floor) == 1 {
-		if floor[0] == '1' {
-			return []line{{0, 0}}
-		}
-
-		return []line{}
-	}
-
 	start, end := 0, 0
 	foundLine := false
 
 	for i, v := range floor {
 		isStartLine := v == '1' && !foundLine
 		isEndLine := v == '0' && foundLine
-		isEndLineLastCell := v == '1' && foundLine && i == len(floor)-1
 
-		if isStartLine {
+		isMostRightStartLine := v == '1' && i == len(floor)-1 && !foundLine
+		isMostRightEndLine := v == '1' && i == len(floor)-1 && foundLine
+
+		if isMostRightStartLine {
+			start, end = i, i
+			lines = append(lines, line{start, end})
+			foundLine = false
+		} else if isMostRightEndLine {
+			end = i
+			lines = append(lines, line{start, end})
+			foundLine = false
+		} else if isStartLine {
 			start = i
 			foundLine = true
 		} else if isEndLine {
 			end = i - 1
+			lines = append(lines, line{start, end})
 			foundLine = false
-			lines = append(lines, line{start, end})
-		} else if isEndLineLastCell {
-			end = i
-			lines = append(lines, line{start, end})
 		}
 	}
 
