@@ -3,42 +3,96 @@ package main
 import "fmt"
 
 func main() {
-	matrix := [][]byte{{'1', '0', '1', '0', '0'}, {'1', '0', '1', '1', '1'}, {'1', '1', '1', '1', '1'}, {'1', '0', '0', '1', '0'}} // Output: 6
+	matrix := [][]byte{
+		{'1', '0', '1', '0', '0'},
+		{'1', '0', '1', '1', '1'},
+		{'1', '1', '1', '1', '1'},
+		{'1', '0', '0', '1', '0'}} // Output: 6
 	fmt.Println(maximalRectangle(matrix))
 }
 
-func maximalRectangle(matrix [][]byte) int {
-	for floor, curFloor := range matrix {
-		isLastFloor := floor == len(matrix)-1
-		if isLastFloor {
-			break
-		}
+type line struct {
+	start int
+	end   int
+}
 
-		lowerFlrLen, holes := surveyLowerFloor(matrix[floor+1], len(curFloor))
-		if holes {
-			continue
+func maximalRectangle(matrix [][]byte) int {
+	for i, v := range matrix {
+		lines := getContinuousLines(v)
+
+		for _, line := range lines {
+			areaByThisLine := getAreaByExploreUpperAndLower(matrix, line.start, line.end, i)
+			fmt.Println("line:", line.start, line.end)
+			fmt.Println("Area by this line:", areaByThisLine)
 		}
 	}
 
 	return 0
 }
 
-func surveyCurrentFloor(currFlr []byte) int {
-	longestLen, startIdx, endIdx := 0
+func getContinuousLines(floor []byte) (lines []line) {
+	start, end := 0, 0
+	foundLine := false
 
-	for i, v := range currFlr {
+	for i, v := range floor {
+		isStartLine := v == '1' && !foundLine
+		isEndLine := v == '0' && foundLine
+		isEndLineLastCell := v == '1' && foundLine && i == len(floor)-1
 
-	}
-
-	return longestLen, startIdx, endIdx
-}
-
-func surveyLowerFloor(lowerFlr []byte, curFlrLen int) (lowerFlrLen int, holes bool) {
-	for len, tile := range lowerFlr {
-		if tile == 0 {
-			return len, len < curFlrLen
+		if isStartLine {
+			start = i
+			foundLine = true
+		} else if isEndLine {
+			end = i - 1
+			foundLine = false
+			lines = append(lines, line{start, end})
+		} else if isEndLineLastCell {
+			end = i
+			lines = append(lines, line{start, end})
 		}
 	}
 
-	return len(lowerFlr), false
+	return lines
+}
+
+func getAreaByExploreUpperAndLower(matrix [][]byte, start, end, currentFloor int) int {
+	// upper
+	floor := currentFloor - 1
+	goodFloorCount := 0
+	for floor >= 0 {
+		upperFloor := matrix[floor]
+		hasHole := false
+		for i := start; i <= end; i++ {
+			if upperFloor[i] == '0' {
+				hasHole = true
+				break
+			}
+		}
+
+		if !hasHole {
+			goodFloorCount++
+		}
+		floor--
+	}
+
+	// lower
+	floor = currentFloor + 1
+	for floor < len(matrix) {
+		lowerFloor := matrix[floor]
+		hasHole := false
+		for i := start; i <= end; i++ {
+			if lowerFloor[i] == '0' {
+				hasHole = true
+				break
+			}
+		}
+
+		if !hasHole {
+			goodFloorCount++
+		}
+		floor++
+	}
+
+	areaByThisLine := (end - start + 1) * (goodFloorCount + 1)
+	return areaByThisLine
 }
