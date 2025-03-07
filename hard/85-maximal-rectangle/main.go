@@ -13,11 +13,33 @@ func main() {
 	// 	{'1'}} // Output: 1
 
 	// 42/74
+	// matrix := [][]byte{
+	// 	{'0', '1'}} // Output: 1
+
+	// 44/74
+	// matrix := [][]byte{
+	// 	{'1', '0', '1', '1', '1'},
+	// 	{'0', '1', '0', '1', '0'},
+	// 	{'1', '1', '0', '1', '1'},
+	// 	{'1', '1', '0', '1', '1'},
+	// 	{'0', '1', '1', '1', '1'}} // Output: 6
+
+	// 69/74
 	matrix := [][]byte{
-		{'0', '1'}} // Output: 1
+		{'0', '1', '1', '0', '0', '1', '0', '1', '0', '1'},
+		{'0', '0', '1', '0', '1', '0', '1', '0', '1', '0'},
+		{'1', '0', '0', '0', '0', '1', '0', '1', '1', '0'},
+		{'0', '1', '1', '1', '1', '1', '1', '0', '1', '0'},
+		{'0', '0', '1', '1', '1', '1', '1', '1', '1', '0'},
+		{'1', '1', '0', '1', '0', '1', '1', '1', '1', '0'},
+		{'0', '0', '0', '1', '1', '0', '0', '0', '1', '0'},
+		{'1', '1', '0', '1', '1', '0', '0', '1', '1', '1'},
+		{'0', '1', '0', '1', '1', '0', '1', '0', '1', '1'}} // output: 10
 
 	fmt.Println(maximalRectangle(matrix))
 }
+
+//TODO: calculatedMap[start-endFloor, start-endCol]bool
 
 type line struct {
 	start int
@@ -32,6 +54,8 @@ func maximalRectangle(matrix [][]byte) int {
 
 		for _, line := range lines {
 			areaByThisLine := getAreaByExploreUpperAndLower(matrix, line.start, line.end, i)
+			// this func have potential to return start|end floor which can use as DP
+
 			fmt.Println("line:", line.start, line.end)
 			fmt.Println("Area by this line:", areaByThisLine)
 
@@ -83,6 +107,7 @@ func getAreaByExploreUpperAndLower(matrix [][]byte, start, end, currentFloor int
 	for floor >= 0 {
 		upperFloor := matrix[floor]
 		hasHole := false
+
 		for i := start; i <= end; i++ {
 			if upperFloor[i] == '0' {
 				hasHole = true
@@ -92,6 +117,8 @@ func getAreaByExploreUpperAndLower(matrix [][]byte, start, end, currentFloor int
 
 		if !hasHole {
 			goodFloorCount++
+		} else {
+			break
 		}
 		floor--
 	}
@@ -110,10 +137,13 @@ func getAreaByExploreUpperAndLower(matrix [][]byte, start, end, currentFloor int
 
 		if !hasHole {
 			goodFloorCount++
+		} else {
+			break
 		}
 		floor++
 	}
 
 	areaByThisLine := (end - start + 1) * (goodFloorCount + 1)
+
 	return areaByThisLine
 }
