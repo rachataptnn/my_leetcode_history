@@ -250,6 +250,25 @@ func getAreaByShrinkableLine(line line, floorNumber int, building building) (upp
 	return area
 }
 
+func recursiveUpper(inputLine line, startFloor int, building building) (stackedFloor int) {
+	currentFloor := startFloor - 1
+	if currentFloor <= 0 {
+		return stackedFloor
+	}
+
+	upperFloor := building.floors[currentFloor]
+	for _, line := range upperFloor.lines {
+		if isLinesOverlap(inputLine, line) {
+			inputLine.start = max(inputLine.start, line.start)
+			inputLine.end = min(inputLine.end, line.end)
+		}
+	}
+
+	return recursiveUpper(inputLine, currentFloor, building)
+}
+
+func recursiveLineShorter()
+
 func isLinesOverlap(line1, line2 line) bool {
 	return line1.start <= line2.end && line1.end >= line2.start
 }
