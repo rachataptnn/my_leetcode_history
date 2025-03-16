@@ -3,6 +3,12 @@ package main
 import "fmt"
 
 func main() {
+	// case 1
+	// eventTime := 5
+	// startTime := []int{1, 3}
+	// endTime := []int{2, 5}
+
+	// case 3
 	eventTime := 10
 	startTime := []int{0, 3, 7, 9}
 	endTime := []int{1, 4, 8, 10}
@@ -15,11 +21,17 @@ type solver struct {
 	endTime    []int
 	eventTime  int
 	boxDetails []boxDetail
+	holes      []hole
 }
 
 type boxDetail struct {
 	longestWithoutThatBox int
 	boxLength             int
+}
+
+type hole struct {
+	start int
+	end   int
 }
 
 func maxFreeTime(eventTime int, startTime []int, endTime []int) int {
@@ -29,12 +41,25 @@ func maxFreeTime(eventTime int, startTime []int, endTime []int) int {
 		eventTime: eventTime,
 	}
 
-	s.calcLongestWithoutThatBox()
+	s.findHoles()
+	max := s.calcLongestWithoutThatBox()
 
-	return 0
+	return max
 }
 
-func (s *solver) calcLongestWithoutThatBox() {
+func (s *solver) findHoles() {
+	for i := 0; i < len(s.startTime)-1; i++ {
+		tmpHole := hole{
+			start: s.endTime[i],
+			end:   s.startTime[i+1],
+		}
+		s.holes = append(s.holes, tmpHole)
+	}
+}
+
+func (s *solver) calcLongestWithoutThatBox() int {
+	max := 0
+
 	for i := 0; i < len(s.startTime); i++ {
 		tmpBox := boxDetail{
 			boxLength: s.endTime[i] - s.startTime[i],
@@ -42,7 +67,7 @@ func (s *solver) calcLongestWithoutThatBox() {
 
 		if i == 0 { // first box
 			if len(s.startTime) > 1 {
-				tmpBox.longestWithoutThatBox = s.startTime[i+1] - s.endTime[i] + tmpBox.boxLength
+				tmpBox.longestWithoutThatBox = s.startTime[i+1]
 			} else {
 				tmpBox.longestWithoutThatBox = s.eventTime - s.endTime[i] + tmpBox.boxLength
 			}
@@ -52,6 +77,40 @@ func (s *solver) calcLongestWithoutThatBox() {
 			tmpBox.longestWithoutThatBox = (s.startTime[i+1] - s.endTime[i-1])
 		}
 
+		if s.canItJumpToOtherHole(i) {
+			// max = tmpBox.longestWithoutThatBox
+		} else {
+			boxLen := s.endTime[i] - s.startTime[i]
+			tmpBox.longestWithoutThatBox = tmpBox.longestWithoutThatBox - boxLen
+		}
+
+		if tmpBox.longestWithoutThatBox > max {
+			max = tmpBox.longestWithoutThatBox
+		}
+
 		s.boxDetails = append(s.boxDetails, tmpBox)
 	}
+
+	return max
+}
+
+func (s *solver) canItJumpToOtherHole(boxNumber int) bool {
+	boxStart := s.startTime[boxNumber]
+	boxEnd := s.endTime[boxNumber]
+	boxLen := boxEnd - boxStart
+
+	for _, hole := range s.holes {
+		cantUseThisHole := hole.start <= boxStart || hole.end >= boxStart || hole.end <= boxEnd || hole.start >= boxEnd
+		if cantUseThisHole {
+			continue
+		}
+
+		holeLen := hole.end - hole.start
+		canUseThisHole := holeLen >= boxLen
+		if canUseThisHole {
+			return true
+		}
+	}
+
+	return false
 }
