@@ -48,6 +48,14 @@ func maxFreeTime(eventTime int, startTime []int, endTime []int) int {
 }
 
 func (s *solver) findHoles() {
+	// if s.startTime[0] > 0 {
+	// 	tmpHole := hole{
+	// 		start: 0,
+	// 		end:   s.startTime[0],
+	// 	}
+	// 	s.holes = append(s.holes, tmpHole)
+	// }
+
 	for i := 0; i < len(s.startTime)-1; i++ {
 		tmpHole := hole{
 			start: s.endTime[i],
@@ -78,7 +86,7 @@ func (s *solver) calcLongestWithoutThatBox() int {
 		}
 
 		if s.canItJumpToOtherHole(i) {
-			// max = tmpBox.longestWithoutThatBox
+			tmpBox.longestWithoutThatBox = tmpBox.longestWithoutThatBox
 		} else {
 			boxLen := s.endTime[i] - s.startTime[i]
 			tmpBox.longestWithoutThatBox = tmpBox.longestWithoutThatBox - boxLen
@@ -99,8 +107,8 @@ func (s *solver) canItJumpToOtherHole(boxNumber int) bool {
 	boxEnd := s.endTime[boxNumber]
 	boxLen := boxEnd - boxStart
 
-	for _, hole := range s.holes {
-		cantUseThisHole := hole.start <= boxStart || hole.end >= boxStart || hole.end <= boxEnd || hole.start >= boxEnd
+	for i, hole := range s.holes {
+		cantUseThisHole := boxNumber-1 == i || boxNumber == i
 		if cantUseThisHole {
 			continue
 		}
