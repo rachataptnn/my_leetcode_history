@@ -6,7 +6,8 @@ import (
 )
 
 func main() {
-	num := "123"
+	// num := "123"
+	num := "112"
 
 	fmt.Println(countBalancedPermutations(num))
 }
@@ -30,7 +31,14 @@ func permute(in []rune, l, r int) []string {
 	if l == r {
 		out = append(out, string(in))
 	} else {
+		used := make(map[rune]bool)
+
 		for i := l; i <= r; i++ {
+			if used[in[i]] {
+				continue
+			}
+			used[in[i]] = true
+
 			in[l], in[i] = in[i], in[l]
 			out = append(out, permute(in, l+1, r)...)
 			in[l], in[i] = in[i], in[l] // backtrack
