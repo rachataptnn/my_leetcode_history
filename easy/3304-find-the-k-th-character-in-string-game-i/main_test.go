@@ -22,6 +22,18 @@ func TestKthCharacter(t *testing.T) {
 			k:    8,
 			want: 'c',
 		},
+		{
+			k:    14,
+			want: 'd',
+		},
+		{
+			k:    6,
+			want: 'c',
+		},
+		{
+			k:    5,
+			want: 'b',
+		},
 	}
 	for _, tc := range testCases {
 		gotC := kthCharacter(tc.k)
