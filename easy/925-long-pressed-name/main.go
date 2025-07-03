@@ -18,55 +18,55 @@ func main() {
 }
 
 func isLongPressedName(name string, typed string) bool {
-	n := len(typed)
+	typedStack := Stack{}
 
-	index := 0
-	for _, nameCh := range name {
-		foundNameMatchTyped := false
-		for index < n {
-			typedCh := rune(typed[index])
-
-			if !foundNameMatchTyped {
-				if nameCh == typedCh {
-					foundNameMatchTyped = true
-
-					index++
-					continue
-				} else {
-					return false
-				}
-			} else if nameCh == typedCh {
-				index++
-				continue
-			} else {
-				break
-				// foundNameMatchTyped = false
-				// index++
-				// continue
-			}
+	for i := 0; i < len(typed); i++ {
+		if i == 0 {
+			typedStack.Push(typed[i])
+			continue
+		}
+		if typed[i] != typed[i-1] {
+			typedStack.Push(typed[i])
 		}
 	}
 
 	return true
 }
 
-// mapName := make(map[string]int)
-// mapTyped := make(map[string]int)
+type Stack struct {
+	elements []byte
+}
 
-// // isAmountValid
-// for _, v := range name {
-// 	mapName[string(v)]++
+// Push adds an element to the top of the stack
+func (s *Stack) Push(value byte) {
+	s.elements = append(s.elements, value)
+}
+
+// Pop removes and returns the top element of the stack
+func (s *Stack) Pop() (byte, bool) {
+	if len(s.elements) == 0 {
+		return 0, false // stack is empty
+	}
+	index := len(s.elements) - 1
+	element := s.elements[index]
+	s.elements = s.elements[:index]
+	return element, true
+}
+
+// IsEmpty checks if the stack is empty
+// func (s *Stack) IsEmpty() bool {
+// 	return len(s.elements) == 0
 // }
-// for _, v := range typed {
-// 	mapTyped[string(v)]++
+
+// Size returns the number of elements in the stack
+// func (s *Stack) Size() int {
+// 	return len(s.elements)
 // }
-// for k, vn := range mapName {
-// 	vt, ok := mapTyped[k]
-// 	if !ok || vt < vn {
-// 		return false
+
+// Peek returns the top element without removing it
+// func (s *Stack) Peek() (int, bool) {
+// 	if len(s.elements) == 0 {
+// 		return 0, false
 // 	}
+// 	return s.elements[len(s.elements)-1], true
 // }
-
-// // isSequenceValid
-
-// return true
