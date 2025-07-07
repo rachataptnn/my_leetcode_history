@@ -11,8 +11,28 @@ func TestKthCharacter(t *testing.T) {
 		want byte
 	}{
 		{
+			k:    1,
+			want: 'a',
+		},
+		{
+			k:    2,
+			want: 'b',
+		},
+		{
+			k:    3,
+			want: 'b',
+		},
+		{
+			k:    4,
+			want: 'c',
+		},
+		{
 			k:    5,
 			want: 'b',
+		},
+		{
+			k:    6,
+			want: 'c',
 		},
 		{
 			k:    10,
@@ -23,16 +43,26 @@ func TestKthCharacter(t *testing.T) {
 			want: 'c',
 		},
 		{
+			k:    11,
+			want: 'c',
+		},
+
+		{
 			k:    14,
 			want: 'd',
 		},
 		{
-			k:    6,
-			want: 'c',
+			k:    15,
+			want: 'd',
 		},
 		{
-			k:    5,
-			want: 'b',
+			k:    16,
+			want: 'e',
+		},
+
+		{
+			k:    500,
+			want: 'j',
 		},
 	}
 	for _, tc := range testCases {
