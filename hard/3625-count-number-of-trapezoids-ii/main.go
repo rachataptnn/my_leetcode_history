@@ -6,7 +6,9 @@ import (
 )
 
 func main() {
-	points := [][]int{{-3, 2}, {3, 0}, {2, 3}, {3, 2}, {2, -3}}
+	// points := [][]int{{-3, 2}, {3, 0}, {2, 3}, {3, 2}, {2, -3}} // ex 1
+
+	points := [][]int{{0, 0}, {1, 0}, {0, 1}, {2, 1}}
 
 	res := countTrapezoids(points)
 	fmt.Println(res)
@@ -25,7 +27,14 @@ func countTrapezoids(points [][]int) int {
 	lines := getLinesFromPoints(pArr)
 	fmt.Println(lines)
 
-	return 0
+	cnt := 0
+	for _, v := range lines {
+		if len(v) > 1 {
+			cnt++
+		}
+	}
+
+	return cnt
 }
 
 type Point [2]float64 // index 0 is x
@@ -51,7 +60,6 @@ func getLinesFromPoints(points []Point) (lines LinesGroupedByAngle) {
 				continue
 			}
 			if isKnewLine(p1, p2, knewLines) {
-				fmt.Printf("p1: .%v, %v.   p2: .%v, %v.   is Knew line\n", p1[0], p1[1], p2[0], p2[1])
 				continue
 			}
 
@@ -60,9 +68,9 @@ func getLinesFromPoints(points []Point) (lines LinesGroupedByAngle) {
 			existedLine, ok := lines[line.Angle]
 			if ok {
 				existedLine = append(existedLine, line)
-				lines[line.Angle] = existedLine
+				lines[abs(line.Angle)] = existedLine
 			} else {
-				lines[line.Angle] = []Line{line}
+				lines[abs(line.Angle)] = []Line{line}
 			}
 
 			// set cache
@@ -72,7 +80,15 @@ func getLinesFromPoints(points []Point) (lines LinesGroupedByAngle) {
 			knewLines[p2p1] = struct{}{}
 		}
 	}
+
 	return lines
+}
+
+func abs(a float64) float64 {
+	if a < 0 {
+		return -a
+	}
+	return a
 }
 
 // Line - Cache
