@@ -17,8 +17,8 @@ func countTrapezoids(points [][]int) int {
 	pArr := []Point{}
 	for _, v := range points {
 		tmpP := Point{}
-		tmpP[0] = v[0]
-		tmpP[1] = v[1]
+		tmpP[0] = float64(v[0])
+		tmpP[1] = float64(v[1])
 		pArr = append(pArr, tmpP)
 	}
 
@@ -28,7 +28,7 @@ func countTrapezoids(points [][]int) int {
 	return 0
 }
 
-type Point [2]int // index 0 is x
+type Point [2]float64 // index 0 is x
 
 type Line struct {
 	Start  Point
@@ -42,12 +42,16 @@ type LinesGroupedByAngle map[float64][]Line
 func getLinesFromPoints(points []Point) (lines LinesGroupedByAngle) {
 	// initialize the returned map to avoid nil map assignment
 	lines = make(LinesGroupedByAngle)
-	knewLines := make(map[Point]Point)
+	knewLines := make(map[[4]float64]struct{})
 
 	for _, p1 := range points {
 		for _, p2 := range points {
-			// get cached
-			if isSameLine(p1, p2) || isKnewLine(p1, p2, knewLines) {
+			// get cache
+			if isSamePoint(p1, p2) {
+				continue
+			}
+			if isKnewLine(p1, p2, knewLines) {
+				fmt.Printf("p1: .%v, %v.   p2: .%v, %v.   is Knew line\n", p1[0], p1[1], p2[0], p2[1])
 				continue
 			}
 
@@ -57,14 +61,15 @@ func getLinesFromPoints(points []Point) (lines LinesGroupedByAngle) {
 			if ok {
 				existedLine = append(existedLine, line)
 				lines[line.Angle] = existedLine
-
 			} else {
 				lines[line.Angle] = []Line{line}
 			}
 
-			// set cached
-			knewLines[p1] = p2
-			knewLines[p2] = p1
+			// set cache
+			p1p2 := [4]float64{p1[0], p1[1], p2[0], p2[1]}
+			p2p1 := [4]float64{p2[0], p2[1], p1[0], p1[1]}
+			knewLines[p1p2] = struct{}{}
+			knewLines[p2p1] = struct{}{}
 		}
 	}
 	return lines
@@ -72,26 +77,17 @@ func getLinesFromPoints(points []Point) (lines LinesGroupedByAngle) {
 
 // Line - Cache
 
-func isSameLine(p1, p2 Point) bool {
+func isSamePoint(p1, p2 Point) bool {
 	p1x, p1y := p1[0], p1[1]
 	p2x, p2y := p2[0], p2[1]
 
 	return p1x == p2x && p1y == p2y
 }
 
-func isKnewLine(p1, p2 Point, knewLines map[Point]Point) bool {
-	p2val, ok := knewLines[p1]
-	if ok {
-		if p2[0] == p2val[0] && p2[1] == p2val[1] {
-			return true
-		}
-	}
-
-	p1val, ok := knewLines[p2]
-	if ok {
-		if p1[0] == p1val[0] && p1[1] == p1val[1] {
-			return true
-		}
+func isKnewLine(p1, p2 Point, knewLines map[[4]float64]struct{}) bool {
+	p1p2 := [4]float64{p1[0], p1[1], p2[0], p2[1]}
+	if _, ok := knewLines[p1p2]; ok {
+		return true
 	}
 
 	return false
@@ -132,21 +128,24 @@ func (l *Line) defineStartAndEnd(point1, point2 Point) {
 }
 
 func (l *Line) getLength() {
-	dx := float64(l.End[0] - l.Start[0])
-	dy := float64(l.End[1] - l.Start[1])
-	l.Length = math.Hypot(dx, dy)
+	x2, x1 := l.End[0], l.Start[0]
+	y2, y1 := l.End[1], l.Start[1]
+
+	a := math.Pow(x2-x1, 2)
+	b := math.Pow(y2-y1, 2)
+	c := math.Sqrt(a + b)
+
+	l.Length = c
 }
 
 func (l *Line) getAngle() {
 	Ax, Ay := l.Start[0], l.Start[1]
 	Bx, By := l.End[0], l.End[1]
 
-	term1 := By - Ay
-	term2 := Bx - Ax
+	dy := By - Ay
+	dx := Bx - Ax
+	m := dy / dx
 
-	m := float64(term1) / float64(term2)
-
-	angle := math.Atan(m)
-
-	l.Angle = angle
+	radians := math.Atan(m)
+	l.Angle = radians * 180 / math.Pi
 }
