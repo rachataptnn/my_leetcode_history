@@ -8,7 +8,7 @@ import (
 func main() {
 	// points := [][]int{{-3, 2}, {3, 0}, {2, 3}, {3, 2}, {2, -3}} // ex 1
 
-	points := [][]int{{0, 0}, {1, 0}, {0, 1}, {2, 1}}
+	points := [][]int{{0, 0}, {1, 0}, {0, 1}, {2, 1}} // ex 2
 
 	res := countTrapezoids(points)
 	fmt.Println(res)
@@ -23,16 +23,12 @@ func countTrapezoids(points [][]int) int {
 		tmpP[1] = float64(v[1])
 		pArr = append(pArr, tmpP)
 	}
+	// rip time comp
 
 	lines := getLinesFromPoints(pArr)
 	fmt.Println(lines)
 
-	cnt := 0
-	for _, v := range lines {
-		if len(v) > 1 {
-			cnt++
-		}
-	}
+	cnt := countUniqTraps(lines)
 
 	return cnt
 }
@@ -123,20 +119,14 @@ func (l *Line) defineStartAndEnd(point1, point2 Point) {
 	start := Point{}
 	end := Point{}
 
-	x1, x2 := point1[0], point2[0]
-	isP1BelowP2 := x1 < x2
+	y1, y2 := point1[1], point2[1]
+	isP1BelowP2 := y1 < y2
 	if isP1BelowP2 {
-		start[0] = point1[0]
-		start[1] = point1[1]
-
-		end[0] = point2[0]
-		end[1] = point2[1]
+		start[0], start[1] = point1[0], point1[1]
+		end[0], end[1] = point2[0], point2[1]
 	} else {
-		end[0] = point1[0]
-		end[1] = point1[1]
-
-		start[0] = point2[0]
-		start[1] = point2[1]
+		start[0], start[1] = point2[0], point2[1]
+		end[0], end[1] = point1[0], point1[1]
 	}
 
 	l.Start = start
@@ -163,5 +153,104 @@ func (l *Line) getAngle() {
 	m := dy / dx
 
 	radians := math.Atan(m)
-	l.Angle = radians * 180 / math.Pi
+	degree := radians * 180 / math.Pi
+
+	if radians < 0 {
+		degree = 180 + degree
+	}
+	l.Angle = degree
+}
+
+// find unique trap
+
+func countUniqTraps(linesGroupedByAngle LinesGroupedByAngle) int {
+	cnt := 0
+	for angle, lines := range linesGroupedByAngle {
+		checkedTraps := make(checkedTraps)
+
+		for i, l1 := range lines {
+			for j, l2 := range lines {
+				if i == j {
+					continue
+				}
+				if checkedTraps.isChecked(l1, l2) { // get cache
+					continue
+				}
+
+				if isTrapezoid(l1, l2) {
+					fmt.Printf("\nAngle[%2f] - found Trapezoid using l1:<%+v> and l2:<%+v>", angle, l1, l2)
+					cnt++
+				}
+
+				checkedTraps.setCheckedTrap(l1, l2) // set cache
+			}
+		}
+	}
+
+	return cnt
+}
+
+type checkedTraps map[[8]float64]struct{}
+
+func (c *checkedTraps) isChecked(l1, l2 Line) bool {
+	checkedTraps := *c
+
+	// l1
+	p1x, p1y := l1.Start[0], l1.Start[1]
+	p2x, p2y := l1.End[0], l1.End[1]
+	// l2
+	p3x, p3y := l2.Start[0], l2.Start[1]
+	p4x, p4y := l2.End[0], l2.End[1]
+
+	p1p2p3p4 := [8]float64{
+		p1x, p1y, p2x, p2y,
+		p3x, p3y, p4x, p4y}
+	if _, ok := checkedTraps[p1p2p3p4]; ok {
+		return true
+	}
+
+	return false
+}
+
+func (c *checkedTraps) setCheckedTrap(l1, l2 Line) {
+	checkedTraps := *c
+
+	// l1
+	p1x, p1y := l1.Start[0], l1.Start[1]
+	p2x, p2y := l1.End[0], l1.End[1]
+	// l2
+	p3x, p3y := l2.Start[0], l2.Start[1]
+	p4x, p4y := l2.End[0], l2.End[1]
+
+	p1p2p3p4 := [8]float64{
+		p1x, p1y, p2x, p2y,
+		p3x, p3y, p4x, p4y}
+	p3p4p1p2 := [8]float64{
+		p3x, p3y, p4x, p4y,
+		p1x, p1y, p2x, p2y}
+	checkedTraps[p1p2p3p4] = struct{}{}
+	checkedTraps[p3p4p1p2] = struct{}{}
+
+	c = &checkedTraps
+}
+
+func isTrapezoid(l1, l2 Line) bool {
+	if l1.Length == l2.Length {
+		return false
+	}
+
+	if l1.Length < l2.Length {
+		l1, l2 = l2, l1
+	}
+
+	p1y, p2y := l1.Start[1], l1.End[1]
+	p3y, p4y := l2.Start[1], l2.End[1]
+
+	isL2StartUpperL1 := p3y > p1y
+	isL2EndLowerL1 := p4y < p2y
+	if isL2StartUpperL1 || isL2EndLowerL1 {
+		return true
+	}
+
+	return false
 }
