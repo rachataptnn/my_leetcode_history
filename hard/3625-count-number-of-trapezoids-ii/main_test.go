@@ -120,3 +120,41 @@ func TestLine_GetLength(t *testing.T) {
 		})
 	}
 }
+
+// points := [][]int{{-3, 2}, {3, 0}, {2, 3}, {3, 2}, {2, -3}} // ex 1
+// points := [][]int{{0, 0}, {1, 0}, {0, 1}, {2, 1}} // ex 2 (expect 1)
+
+// points := [][]int{{-32, 12}, {-32, -94}, {-32, -15}, {-30, 88}} // case-a (expect 0)
+
+func TestCountTrapezoids(t *testing.T) {
+	tests := []struct {
+		name   string
+		points [][]int
+		want   int
+	}{
+		{
+			name:   "example 1",
+			points: [][]int{{-3, 2}, {3, 0}, {2, 3}, {3, 2}, {2, -3}},
+			want:   2,
+		},
+		{
+			name:   "example 2",
+			points: [][]int{{0, 0}, {1, 0}, {0, 1}, {2, 1}},
+			want:   1,
+		},
+		{
+			name:   "case with no trapezoids",
+			points: [][]int{{-32, 12}, {-32, -94}, {-32, -15}, {-30, 88}},
+			want:   0,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			cnt := countTrapezoids(test.points)
+			if cnt != test.want {
+				t.Errorf("countTrapezoids(%v) = %d, want %d", test.points, cnt, test.want)
+			}
+		})
+	}
+}

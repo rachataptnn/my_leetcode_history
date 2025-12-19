@@ -7,11 +7,13 @@ import (
 
 func main() {
 	// points := [][]int{{-3, 2}, {3, 0}, {2, 3}, {3, 2}, {2, -3}} // ex 1
+	// points := [][]int{{0, 0}, {1, 0}, {0, 1}, {2, 1}} // ex 2
 
-	points := [][]int{{0, 0}, {1, 0}, {0, 1}, {2, 1}} // ex 2
+	// points := [][]int{{-32, 12}, {-32, -94}, {-32, -15}, {-30, 88}} //
+	points := [][]int{{71, -89}, {-75, -89}, {-9, 11}, {-24, -89}, {-51, -89}, {-77, -89}, {42, 11}} // 418/551
 
 	res := countTrapezoids(points)
-	fmt.Println(res)
+	fmt.Println("\n", res)
 }
 
 func countTrapezoids(points [][]int) int {
@@ -26,7 +28,6 @@ func countTrapezoids(points [][]int) int {
 	// rip time comp
 
 	lines := getLinesFromPoints(pArr)
-	fmt.Println(lines)
 
 	cnt := countUniqTraps(lines)
 
@@ -177,9 +178,15 @@ func countUniqTraps(linesGroupedByAngle LinesGroupedByAngle) int {
 					continue
 				}
 
+				if angle > 0 {
+					fmt.Println("b")
+				}
+
 				if isTrapezoid(l1, l2) {
-					fmt.Printf("\nAngle[%2f] - found Trapezoid using l1:<%+v> and l2:<%+v>", angle, l1, l2)
+					// fmt.Printf("\nAngle[%2f] - found Trapezoid using l1:<%+v> and l2:<%+v>", angle, l1, l2)
 					cnt++
+					fmt.Printf("\nFound:%d - angle:%.2f\n", cnt, angle)
+					fmt.Println(formatEasyToReadLine(l1, l2))
 				}
 
 				checkedTraps.setCheckedTrap(l1, l2) // set cache
@@ -243,14 +250,41 @@ func isTrapezoid(l1, l2 Line) bool {
 		l1, l2 = l2, l1
 	}
 
-	p1y, p2y := l1.Start[1], l1.End[1]
-	p3y, p4y := l2.Start[1], l2.End[1]
+	l1start_X, l1start_Y, l1end_X, l1end_Y := l1.Start[0], l1.Start[1], l1.End[0], l1.End[1]
+	l2start_X, l2start_Y, l2end_X, l2end_Y := l2.Start[0], l2.Start[1], l2.End[0], l2.End[1]
 
-	isL2StartUpperL1 := p3y > p1y
-	isL2EndLowerL1 := p4y < p2y
+	isL2StartUpperL1 := l2start_Y > l1start_Y
+	isL2EndLowerL1 := l2end_Y < l1end_Y
+
 	if isL2StartUpperL1 || isL2EndLowerL1 {
-		return true
+		// from: y = mx + b
+		// lets: m = 1 (why: i grouped lines by angle. the slope is ignored)
+		// b := x - y
+		// overlapsed = b1 == b2
+
+		b1 := l1start_Y - l1start_X
+		b2 := l2start_Y - l2start_X
+
+		isVerticalOverlapsed := l1start_X == l2start_X && l1end_X == l2end_X
+		isOverlapsed := b1 == b2 && l1start_Y == l2start_Y
+		if isVerticalOverlapsed || isOverlapsed {
+			return false
+		} else {
+			return true
+		}
 	}
 
 	return false
+}
+
+// printer helping
+func formatEasyToReadLine(l1, l2 Line) string {
+	text := `line1 [%7.2f, %7.2f] -> [%7.2f, %7.2f]
+line2 [%7.2f, %7.2f] -> [%7.2f, %7.2f]`
+
+	return fmt.Sprintf(
+		text,
+		l1.Start[0], l1.Start[1], l1.End[0], l1.End[1],
+		l2.Start[0], l2.Start[1], l2.End[0], l2.End[1],
+	)
 }
