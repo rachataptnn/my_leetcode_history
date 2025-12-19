@@ -10,7 +10,8 @@ func main() {
 	// points := [][]int{{0, 0}, {1, 0}, {0, 1}, {2, 1}} // ex 2
 
 	// points := [][]int{{-32, 12}, {-32, -94}, {-32, -15}, {-30, 88}} //
-	points := [][]int{{71, -89}, {-75, -89}, {-9, 11}, {-24, -89}, {-51, -89}, {-77, -89}, {42, 11}} // 418/551
+	// points := [][]int{{71, -89}, {-75, -89}, {-9, 11}, {-24, -89}, {-51, -89}, {-77, -89}, {42, 11}} // 418/551
+	points := [][]int{{-33, -9}, {30, -37}, {-10, -9}, {61, -9}, {56, -67}, {36, -9}, {36, 100}, {36, 96}, {-32, 84}, {18, 34}, {-10, -82}} // 482/551
 
 	res := countTrapezoids(points)
 	fmt.Println("\n", res)
@@ -178,10 +179,6 @@ func countUniqTraps(linesGroupedByAngle LinesGroupedByAngle) int {
 					continue
 				}
 
-				if angle > 0 {
-					fmt.Println("b")
-				}
-
 				if isTrapezoid(l1, l2) {
 					// fmt.Printf("\nAngle[%2f] - found Trapezoid using l1:<%+v> and l2:<%+v>", angle, l1, l2)
 					cnt++
@@ -242,9 +239,9 @@ func (c *checkedTraps) setCheckedTrap(l1, l2 Line) {
 }
 
 func isTrapezoid(l1, l2 Line) bool {
-	if l1.Length == l2.Length {
-		return false
-	}
+	// if l1.Length == l2.Length {
+	// 	return false
+	// }
 
 	if l1.Length < l2.Length {
 		l1, l2 = l2, l1

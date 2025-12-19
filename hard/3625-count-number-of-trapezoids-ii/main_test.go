@@ -147,13 +147,25 @@ func TestCountTrapezoids(t *testing.T) {
 			points: [][]int{{-32, 12}, {-32, -94}, {-32, -15}, {-30, 88}},
 			want:   0,
 		},
+		{
+			name:   "there are something called Paralelogram",
+			points: [][]int{{71, -89}, {-75, -89}, {-9, 11}, {-24, -89}, {-51, -89}, {-77, -89}, {42, 11}}, // 418/551
+			want:   10,
+		},
+		{
+			name:   "fix overlapsed (try 001/???)",
+			points: [][]int{{-33, -9}, {30, -37}, {-10, -9}, {61, -9}, {56, -67}, {36, -9}, {36, 100}, {36, 96}, {-32, 84}, {18, 34}, {-10, -82}}, // 482/551
+			want:   3,
+		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			cnt := countTrapezoids(test.points)
 			if cnt != test.want {
-				t.Errorf("countTrapezoids(%v) = %d, want %d", test.points, cnt, test.want)
+				t.Errorf(`\ncase name %s
+got:  %d
+want: %d`, test.name, cnt, test.want)
 			}
 		})
 	}
