@@ -10,8 +10,9 @@ func main() {
 	// points := [][]int{{0, 0}, {1, 0}, {0, 1}, {2, 1}} // ex 2
 
 	// points := [][]int{{-32, 12}, {-32, -94}, {-32, -15}, {-30, 88}} //
-	// points := [][]int{{71, -89}, {-75, -89}, {-9, 11}, {-24, -89}, {-51, -89}, {-77, -89}, {42, 11}} // 418/551
-	points := [][]int{{-33, -9}, {30, -37}, {-10, -9}, {61, -9}, {56, -67}, {36, -9}, {36, 100}, {36, 96}, {-32, 84}, {18, 34}, {-10, -82}} // 482/551
+	points := [][]int{{71, -89}, {-75, -89}, {-9, 11}, {-24, -89}, {-51, -89}, {-77, -89}, {42, 11}} // 418/551
+
+	// points := [][]int{{-33, -9}, {30, -37}, {-10, -9}, {61, -9}, {56, -67}, {36, -9}, {36, 100}, {36, 96}, {-32, 84}, {18, 34}, {-10, -82}} // 482/551
 
 	res := countTrapezoids(points)
 	fmt.Println("\n", res)
@@ -197,6 +198,12 @@ func countUniqTraps(linesGroupedByAngle LinesGroupedByAngle) int {
 type checkedTraps map[[8]float64]struct{}
 
 func (c *checkedTraps) isChecked(l1, l2 Line) bool {
+	if l1.Angle == 0.00 || l1.Angle > 56 {
+		if l1.Start[0] == -24.00 || l2.Start[0] == -24.00 {
+			fmt.Println("here")
+		}
+	}
+
 	checkedTraps := *c
 
 	// l1
@@ -206,10 +213,19 @@ func (c *checkedTraps) isChecked(l1, l2 Line) bool {
 	p3x, p3y := l2.Start[0], l2.Start[1]
 	p4x, p4y := l2.End[0], l2.End[1]
 
+	// line swap overcount - prevention
 	p1p2p3p4 := [8]float64{
 		p1x, p1y, p2x, p2y,
 		p3x, p3y, p4x, p4y}
 	if _, ok := checkedTraps[p1p2p3p4]; ok {
+		return true
+	}
+
+	// parallelogram overcounts - prevention
+	p1p3p2p4 := [8]float64{
+		p1x, p1y, p3x, p3y,
+		p2x, p2y, p4x, p4y}
+	if _, ok := checkedTraps[p1p3p2p4]; ok {
 		return true
 	}
 
@@ -226,6 +242,7 @@ func (c *checkedTraps) setCheckedTrap(l1, l2 Line) {
 	p3x, p3y := l2.Start[0], l2.Start[1]
 	p4x, p4y := l2.End[0], l2.End[1]
 
+	// line swap overcount - prevention
 	p1p2p3p4 := [8]float64{
 		p1x, p1y, p2x, p2y,
 		p3x, p3y, p4x, p4y}
@@ -235,49 +252,37 @@ func (c *checkedTraps) setCheckedTrap(l1, l2 Line) {
 	checkedTraps[p1p2p3p4] = struct{}{}
 	checkedTraps[p3p4p1p2] = struct{}{}
 
+	// parallelogram overcounts - prevention
+	p1p3p2p4 := [8]float64{
+		p1x, p1y, p3x, p3y,
+		p2x, p2y, p4x, p4y}
+	p2p4p1p3 := [8]float64{
+		p2x, p2y, p4x, p4y,
+		p1x, p1y, p3x, p3y}
+	checkedTraps[p1p3p2p4] = struct{}{}
+	checkedTraps[p2p4p1p3] = struct{}{}
+
 	c = &checkedTraps
 }
 
 func isTrapezoid(l1, l2 Line) bool {
-	// if l1.Length == l2.Length {
-	// 	return false
-	// }
+	x1, y1 := l1.Start[0], l1.Start[1]
+	x2, y2 := l1.End[0], l1.End[1]
+	x3, y3 := l2.Start[0], l2.Start[1]
 
-	if l1.Length < l2.Length {
-		l1, l2 = l2, l1
-	}
+	term1 := y2 - y3
+	term2 := y3 - y1
+	term3 := y1 - y2
+	areaOf3Dots := 0.5 * (x1*(term1) + x2*(term2) + x3*(term3))
 
-	l1start_X, l1start_Y, l1end_X, l1end_Y := l1.Start[0], l1.Start[1], l1.End[0], l1.End[1]
-	l2start_X, l2start_Y, l2end_X, l2end_Y := l2.Start[0], l2.Start[1], l2.End[0], l2.End[1]
-
-	isL2StartUpperL1 := l2start_Y > l1start_Y
-	isL2EndLowerL1 := l2end_Y < l1end_Y
-
-	if isL2StartUpperL1 || isL2EndLowerL1 {
-		// from: y = mx + b
-		// lets: m = 1 (why: i grouped lines by angle. the slope is ignored)
-		// b := x - y
-		// overlapsed = b1 == b2
-
-		b1 := l1start_Y - l1start_X
-		b2 := l2start_Y - l2start_X
-
-		isVerticalOverlapsed := l1start_X == l2start_X && l1end_X == l2end_X
-		isOverlapsed := b1 == b2 && l1start_Y == l2start_Y
-		if isVerticalOverlapsed || isOverlapsed {
-			return false
-		} else {
-			return true
-		}
-	}
-
-	return false
+	return abs(areaOf3Dots) > 0
 }
 
 // printer helping
 func formatEasyToReadLine(l1, l2 Line) string {
-	text := `line1 [%7.2f, %7.2f] -> [%7.2f, %7.2f]
-line2 [%7.2f, %7.2f] -> [%7.2f, %7.2f]`
+	text := `
+	line1 [%7.2f, %7.2f] -> [%7.2f, %7.2f]
+	line2 [%7.2f, %7.2f] -> [%7.2f, %7.2f]`
 
 	return fmt.Sprintf(
 		text,

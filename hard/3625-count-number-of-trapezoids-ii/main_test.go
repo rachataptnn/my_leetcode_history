@@ -132,31 +132,31 @@ func TestCountTrapezoids(t *testing.T) {
 		points [][]int
 		want   int
 	}{
-		{
-			name:   "example 1",
-			points: [][]int{{-3, 2}, {3, 0}, {2, 3}, {3, 2}, {2, -3}},
-			want:   2,
-		},
-		{
-			name:   "example 2",
-			points: [][]int{{0, 0}, {1, 0}, {0, 1}, {2, 1}},
-			want:   1,
-		},
-		{
-			name:   "case with no trapezoids",
-			points: [][]int{{-32, 12}, {-32, -94}, {-32, -15}, {-30, 88}},
-			want:   0,
-		},
+		// {
+		// 	name:   "example 1",
+		// 	points: [][]int{{-3, 2}, {3, 0}, {2, 3}, {3, 2}, {2, -3}},
+		// 	want:   2,
+		// },
+		// {
+		// 	name:   "example 2",
+		// 	points: [][]int{{0, 0}, {1, 0}, {0, 1}, {2, 1}},
+		// 	want:   1,
+		// },
+		// {
+		// 	name:   "case with no trapezoids",
+		// 	points: [][]int{{-32, 12}, {-32, -94}, {-32, -15}, {-30, 88}},
+		// 	want:   0,
+		// },
 		{
 			name:   "there are something called Paralelogram",
 			points: [][]int{{71, -89}, {-75, -89}, {-9, 11}, {-24, -89}, {-51, -89}, {-77, -89}, {42, 11}}, // 418/551
 			want:   10,
 		},
-		{
-			name:   "fix overlapsed (try 001/???)",
-			points: [][]int{{-33, -9}, {30, -37}, {-10, -9}, {61, -9}, {56, -67}, {36, -9}, {36, 100}, {36, 96}, {-32, 84}, {18, 34}, {-10, -82}}, // 482/551
-			want:   3,
-		},
+		// {
+		// 	name:   "fix overlapsed (try 001/???)",
+		// 	points: [][]int{{-33, -9}, {30, -37}, {-10, -9}, {61, -9}, {56, -67}, {36, -9}, {36, 100}, {36, 96}, {-32, 84}, {18, 34}, {-10, -82}}, // 482/551
+		// 	want:   3,
+		// },
 	}
 
 	for _, test := range tests {

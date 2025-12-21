@@ -1,0 +1,16 @@
+	// from: y = mx + b
+	// lets: m = 1 (why: i grouped lines by angle, the slope is ignored)
+	// b := y - x
+	b1 := l1start_Y - l1start_X
+	b2 := l2start_Y - l2start_X
+
+	isShareStart := l1start_X == l2start_X && l1start_Y == l2start_Y
+	isShareEnd := l1end_X == l2end_X && l1end_Y == l2end_Y
+	if isShareStart || isShareEnd {
+		return false
+	}
+
+	isShareYIntercept := b1 == b2
+	if isShareYIntercept {
+		return false
+	}
