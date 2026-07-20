@@ -195,15 +195,11 @@ func countUniqTraps(linesGroupedByAngle LinesGroupedByAngle) int {
 	return cnt
 }
 
-type checkedTraps map[[8]float64]struct{}
+type topLeftDot [2]float64
+type anotherDot [2]float64
+type checkedTraps map[topLeftDot]map[anotherDot]struct{}
 
 func (c *checkedTraps) isChecked(l1, l2 Line) bool {
-	if l1.Angle == 0.00 || l1.Angle > 56 {
-		if l1.Start[0] == -24.00 || l2.Start[0] == -24.00 {
-			fmt.Println("here")
-		}
-	}
-
 	checkedTraps := *c
 
 	// l1
@@ -214,20 +210,12 @@ func (c *checkedTraps) isChecked(l1, l2 Line) bool {
 	p4x, p4y := l2.End[0], l2.End[1]
 
 	// line swap overcount - prevention
-	p1p2p3p4 := [8]float64{
-		p1x, p1y, p2x, p2y,
-		p3x, p3y, p4x, p4y}
-	if _, ok := checkedTraps[p1p2p3p4]; ok {
-		return true
-	}
-
-	// parallelogram overcounts - prevention
-	p1p3p2p4 := [8]float64{
-		p1x, p1y, p3x, p3y,
-		p2x, p2y, p4x, p4y}
-	if _, ok := checkedTraps[p1p3p2p4]; ok {
-		return true
-	}
+	// p1p2p3p4 := [8]float64{
+	// 	p1x, p1y, p2x, p2y,
+	// 	p3x, p3y, p4x, p4y}
+	// if _, ok := checkedTraps[p1p2p3p4]; ok {
+	// 	return true
+	// }
 
 	return false
 }
@@ -236,33 +224,84 @@ func (c *checkedTraps) setCheckedTrap(l1, l2 Line) {
 	checkedTraps := *c
 
 	// l1
-	p1x, p1y := l1.Start[0], l1.Start[1]
-	p2x, p2y := l1.End[0], l1.End[1]
+	x1, y1 := l1.Start[0], l1.Start[1]
+	x2, y2 := l1.End[0], l1.End[1]
 	// l2
-	p3x, p3y := l2.Start[0], l2.Start[1]
-	p4x, p4y := l2.End[0], l2.End[1]
+	x3, y3 := l2.Start[0], l2.Start[1]
+	x4, y4 := l2.End[0], l2.End[1]
 
-	// line swap overcount - prevention
-	p1p2p3p4 := [8]float64{
-		p1x, p1y, p2x, p2y,
-		p3x, p3y, p4x, p4y}
-	p3p4p1p2 := [8]float64{
-		p3x, p3y, p4x, p4y,
-		p1x, p1y, p2x, p2y}
-	checkedTraps[p1p2p3p4] = struct{}{}
-	checkedTraps[p3p4p1p2] = struct{}{}
+	l1HigherDot, l1LowerDot := declareVerticalDot([2]float64{x1, y1}, [2]float64{x2, y2})
+	l2HigherDot, l2LowerDot := declareVerticalDot([2]float64{x3, y3}, [2]float64{x4, y4})
 
-	// parallelogram overcounts - prevention
-	p1p3p2p4 := [8]float64{
-		p1x, p1y, p3x, p3y,
-		p2x, p2y, p4x, p4y}
-	p2p4p1p3 := [8]float64{
-		p2x, p2y, p4x, p4y,
-		p1x, p1y, p3x, p3y}
-	checkedTraps[p1p3p2p4] = struct{}{}
-	checkedTraps[p2p4p1p3] = struct{}{}
+	if l1HigherDot[1] > l2HigherDot[1] {
+		topLeftDot := [2]float64{l1HigherDot[0], l1HigherDot[1]}
+
+		anotherDots := make(map[anotherDot]struct{})
+		anotherDots[[2]float64{l1LowerDot[0], l1LowerDot[1]}] = struct{}{}
+		anotherDots[[2]float64{x3, y3}] = struct{}{}
+		anotherDots[[2]float64{x4, y4}] = struct{}{}
+
+		checkedTraps[topLeftDot] = anotherDots
+
+		return
+	} else if l1HigherDot[1] < l2HigherDot[1] {
+		topLeftDot := [2]float64{l2HigherDot[0], l2HigherDot[1]}
+
+		anotherDots := make(map[anotherDot]struct{})
+		anotherDots[[2]float64{l2LowerDot[0], l2LowerDot[1]}] = struct{}{}
+		anotherDots[[2]float64{x1, y1}] = struct{}{}
+		anotherDots[[2]float64{x2, y2}] = struct{}{}
+
+		checkedTraps[topLeftDot] = anotherDots
+
+		return
+	} else {
+		l1LeftDot, l1RightDot := declareHorizontalDot([2]float64{x1, y1}, [2]float64{x2, y2})
+		l2LeftDot, l2RightDot := declareHorizontalDot([2]float64{x3, y3}, [2]float64{x4, y4})
+
+		if l1LeftDot[0] < l2LeftDot[0] {
+			topLeftDot := [2]float64{l1LeftDot[0], l1RightDot[1]}
+
+			anotherDots := make(map[anotherDot]struct{})
+			anotherDots[[2]float64{l2RightDot[0], l2RightDot[1]}] = struct{}{}
+			anotherDots[[2]float64{x3, y3}] = struct{}{}
+			anotherDots[[2]float64{x4, y4}] = struct{}{}
+
+			checkedTraps[topLeftDot] = anotherDots
+
+			return
+		} else if l1LeftDot[0] > l2LeftDot[0] {
+			topLeftDot := [2]float64{l2LeftDot[0], l2RightDot[1]}
+
+			anotherDots := make(map[anotherDot]struct{})
+			anotherDots[[2]float64{l1RightDot[0], l1RightDot[1]}] = struct{}{}
+			anotherDots[[2]float64{x3, y3}] = struct{}{}
+			anotherDots[[2]float64{x4, y4}] = struct{}{}
+
+			checkedTraps[topLeftDot] = anotherDots
+
+			return
+		}
+
+	}
 
 	c = &checkedTraps
+}
+
+func declareVerticalDot(a, b [2]float64) (higher, lower [2]float64) {
+	if a[1] > b[1] {
+		return a, b
+	}
+
+	return b, a
+}
+
+func declareHorizontalDot(a, b [2]float64) (left, right [2]float64) {
+	if a[0] > b[0] {
+		return a, b
+	}
+
+	return b, a
 }
 
 func isTrapezoid(l1, l2 Line) bool {
