@@ -27,24 +27,27 @@ func distMoney(money int, children int) int {
 	}
 
 	childGot8 := 0
+	noMoneyChild := 0
 	for v := range children {
-		childNo := v + 1
-		if money <= 8 {
-			if money == 4 {
-				childGot8--
-			}
+		if money >= noMoneyChild && money-8 >= 0 {
+			money -= 8
+			childGot8++
+		}
+
+		noMoneyChild = children - childGot8
+		if money < noMoneyChild {
+			childGot8--
+			noMoneyChild++
+			money += 8
+		}
+
+		if noMoneyChild*4 == money {
+			childGot8--
 			break
 		}
-		money -= childNo * 8
-		childGot8++
-	}
-	if money == 0 {
-		return childGot8
+
+		fmt.Println(v)
 	}
 
-	noMoneyChild := children - childGot8
-	if money >= noMoneyChild {
-		return childGot8
-	}
-	return childGot8 - 1
+	return childGot8
 }

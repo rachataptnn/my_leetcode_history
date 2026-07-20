@@ -25,11 +25,11 @@ func TestDistMoney(t *testing.T) {
 		// 	children:  2,
 		// 	childGot8: 0,
 		// },
-		// {
-		// 	money:     8,
-		// 	children:  2,
-		// 	childGot8: 0,
-		// },
+		{
+			money:     8,
+			children:  2,
+			childGot8: 0,
+		},
 		{
 			money:     12,
 			children:  3,
@@ -40,7 +40,10 @@ func TestDistMoney(t *testing.T) {
 	for _, v := range tests {
 		actual := distMoney(v.money, v.children)
 		if actual != v.childGot8 {
-			t.Errorf("distMoney(%d, %d) = %d, want %d", v.money, v.children, actual, v.childGot8)
+			t.Errorf(`
+				money: %d, child: %d, 
+				actual: %d
+				want: %d`, v.money, v.children, actual, v.childGot8)
 		}
 	}
 }
